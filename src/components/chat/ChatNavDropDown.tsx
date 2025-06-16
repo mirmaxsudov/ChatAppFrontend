@@ -1,10 +1,12 @@
-import { AtSign, Moon, Pen, User, Users } from "lucide-react";
-import { DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "../ui/dropdown-menu";
+import { AtSign, Moon, Pen, Sun, User, Users } from "lucide-react";
+import { DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "../ui/dropdown-menu";
 import Link from "next/link";
-import { Checkbox } from "../ui/checkbox";
-import { ThemeToggle } from "../ThemeToggle";
+import { useTheme } from "next-themes";
+import { capitalizeFirstLetter } from "@/helper/Capitalize";
 
 const ChatNavDropDown = () => {
+    const { theme, setTheme } = useTheme();
+
     return (
         <>
             <DropdownMenuContent className="dark:bg-[#23262F]">
@@ -26,10 +28,9 @@ const ChatNavDropDown = () => {
                     <Users />
                     New Group
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <Moon />
-                    Dark Mode
-                    <ThemeToggle />
+                <DropdownMenuItem onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
+                    {theme === "light" ? <Moon /> : <Sun />}
+                    {capitalizeFirstLetter(theme as string)} Mode
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                     <User />

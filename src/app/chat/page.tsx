@@ -1,9 +1,14 @@
-const ChatPage = () => {
-    return (<>
-        <div>
-            <h1>Chat Page</h1>
-        </div>
-    </>)
-}
+import ChatHeader from "@/components/chat/ChatHeader";
 
-export default ChatPage;
+const Chat = () => {
+    return (
+        <div className="relative h-full w-full">
+            <ChatHeader />
+            <div className="p-[8px]"> {/* Adjust pt-12 to match header height */}
+                Chat content here
+            </div>
+        </div>
+    );
+};
+
+export default Chat;

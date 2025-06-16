@@ -1,6 +1,10 @@
+import ChatHeader from "./ChatHeader";
+
 const Chat = () => {
     return <>
-        Chat
+        <div className="relative">
+            <ChatHeader />
+        </div>
     </>
 }
 

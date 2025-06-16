@@ -54,8 +54,8 @@ const ChatLayout = ({
                 className="w-2 cursor-col-resize bg-gray-200 dark:bg-[#23262F] hover:bg-gray-300 dark:hover:bg-[#2A2D36] transition-colors duration-300"
                 onMouseDown={handleMouseDown}
             />
-            <div className="flex-1 h-full bg-white dark:bg-[#020618] flex justify-center items-center transition-colors duration-300">
-                <NotFound title="No chats here yet…" />
+            <div className="flex-1 h-full bg-white dark:bg-[#020618] transition-colors duration-300">
+                {children}
             </div>
         </section>
     );
