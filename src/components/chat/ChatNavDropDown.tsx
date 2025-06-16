@@ -7,7 +7,7 @@ import { ThemeToggle } from "../ThemeToggle";
 const ChatNavDropDown = () => {
     return (
         <>
-            <DropdownMenuContent>
+            <DropdownMenuContent className="dark:bg-[#23262F]">
                 <DropdownMenuItem>
                     <Link href={"/profile"} className="flex items-center justify-between gap-[10px]">
                         <img className="rounded" width={30} height={30} src={"https://wallpapers.com/images/featured/pretty-profile-pictures-6x5bfef0mhb60qyl.jpg"} alt="Image" />
