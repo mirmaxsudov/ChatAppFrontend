@@ -5,6 +5,16 @@ import JustTextMessageLeft from "./messages/JustTextMessageLeft";
 import JustTextMessageRight from "./messages/JustTextMessageRight";
 
 const ChatContent = () => {
+
+
+
+
+
+
+
+
+
+    
     return <>
         <JustTextMessageRight message={"Something"} />
         <JustTextMessageRight message={"✔️"} />
