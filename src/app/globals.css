@@ -129,3 +129,7 @@
   -ms-overflow-style: none;  
   scrollbar-width: none;     
 }
+
+.border-radius {
+  border-radius: inherit;
+}
