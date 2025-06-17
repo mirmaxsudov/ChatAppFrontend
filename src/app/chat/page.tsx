@@ -1,12 +1,15 @@
+import ChatContent from "@/components/chat/ChatContent";
+import ChatFooter from "@/components/chat/ChatFooter";
 import ChatHeader from "@/components/chat/ChatHeader";
 
 const Chat = () => {
     return (
-        <div className="relative h-full w-full">
+        <div className="flex flex-col h-screen w-full">
             <ChatHeader />
-            <div className="p-[8px]"> {/* Adjust pt-12 to match header height */}
-                Chat content here
+            <div className="flex-1 overflow-y-auto p-[8px]">
+                <ChatContent />
             </div>
+            <ChatFooter />
         </div>
     );
 };
