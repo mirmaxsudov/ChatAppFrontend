@@ -1,20 +1,27 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { cn } from "@/lib/utils";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import {useRef, useState} from "react";
+import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Button} from "@/components/ui/button";
+import {Label} from "@/components/ui/label";
+import {ThemeToggle} from "@/components/ThemeToggle";
+import {cn} from "@/lib/utils";
+import {useForm} from "react-hook-form";
+import {z} from "zod";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {lastStep, sendVerificationCode, verifyCode} from "@/api/auth/email.api";
+import useMyNotice from "@/hooks/useMyNotice";
+import NoticeEnum from "@/enums/NoticeEnum";
+import {Spinner} from "@/helper/tsx/Spinner";
+import {AxiosError} from "axios";
+import useUser from "@/store/useUser";
+import {useRouter} from "next/navigation";
 
 const steps = [
-    { title: "Account", description: "Create your account" },
-    { title: "Verify", description: "Verify your email" },
-    { title: "Profile", description: "Complete your profile" },
+    {title: "Account", description: "Create your account"},
+    {title: "Verify", description: "Verify your email"},
+    {title: "Profile", description: "Complete your profile"},
 ];
 
 const accountSchema = z.object({
@@ -36,6 +43,14 @@ export default function RegisterPage() {
     const [verificationCode, setVerificationCode] = useState(["", "", "", "", "", ""]);
     const [verificationError, setVerificationError] = useState("");
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+    const {showMessage} = useMyNotice();
+    const [loadings, setLoadings] = useState({
+        sendVerificationCodeLoading: false,
+        verifyCodeLoading: false,
+        lastStepLoading: false,
+    });
+    const setUser = useUser(state => state.setUser);
+    const router = useRouter();
 
     const accountForm = useForm({
         resolver: zodResolver(accountSchema),
@@ -103,7 +118,7 @@ export default function RegisterPage() {
     const validateVerificationCode = () => {
         const code = verificationCode.join('');
         try {
-            verificationSchema.parse({ code });
+            verificationSchema.parse({code});
             return true;
         } catch (error) {
             if (error instanceof z.ZodError) {
@@ -117,17 +132,91 @@ export default function RegisterPage() {
         if (step === 0) {
             const isValid = await accountForm.trigger();
             if (!isValid) return;
+
+            setLoadings({...loadings, sendVerificationCodeLoading: true});
+            const toastRef = {};
+
+            try {
+                showMessage("Sending verification code...", NoticeEnum.LOADING, undefined, toastRef);
+                const response = await sendVerificationCode(accountForm.getValues().email, accountForm.getValues().password);
+                showMessage(response.data, NoticeEnum.SUCCESS, undefined, toastRef);
+            } catch (e) {
+                if (e instanceof AxiosError) {
+                    if (e.response?.status === 409)
+                        showMessage("You used all the verification codes", NoticeEnum.ERROR, undefined, toastRef);
+                    return;
+                }
+                showMessage("Something went wrong. Try again!", NoticeEnum.ERROR, undefined, toastRef)
+                return;
+            } finally {
+                setLoadings({...loadings, sendVerificationCodeLoading: false});
+            }
         } else if (step === 1) {
             const isValid = validateVerificationCode();
             if (!isValid) return;
+
+            setLoadings({...loadings, verifyCodeLoading: true});
+            const toastRef = {};
+
+            try {
+                showMessage("Verifying code...", NoticeEnum.LOADING, undefined, toastRef);
+                const response = await verifyCode(accountForm.getValues().email, verificationCode.join(''), accountForm.getValues().password);
+                showMessage(response.data, NoticeEnum.SUCCESS, undefined, toastRef);
+            } catch (e) {
+                if (e instanceof AxiosError) {
+                    if (e.response?.status === 409)
+                        showMessage(e.response.data.message, NoticeEnum.ERROR, undefined, toastRef);
+                    else if (e.response?.status === 404)
+                        showMessage("There is no this verification code for this email.", NoticeEnum.ERROR, undefined, toastRef);
+                    return;
+                }
+                showMessage("Something went wrong. Try again!", NoticeEnum.ERROR, undefined, toastRef)
+                return;
+            } finally {
+                setLoadings({...loadings, verifyCodeLoading: false});
+            }
         } else if (step === 2) {
             const isValid = await profileForm.trigger();
             if (!isValid) return;
+
+            setLoadings({...loadings, lastStepLoading: true});
+            const toastRef = {};
+
+            try {
+                showMessage("Creating account...", NoticeEnum.LOADING, undefined, toastRef);
+                const response = await lastStep(accountForm.getValues().email, verificationCode.join(''), accountForm.getValues().password, profileForm.getValues().firstName, profileForm.getValues().lastName);
+                setUser(response.data);
+                showMessage(response.message, NoticeEnum.SUCCESS, undefined, toastRef);
+                router.push("/chat");
+            } catch (e) {
+                if (e instanceof AxiosError) {
+                    if (e.response?.status === 409)
+                        showMessage(e.response.data.message, NoticeEnum.ERROR, undefined, toastRef);
+                    else if (e.response?.status === 400)
+                        showMessage("There is no verification code.", NoticeEnum.ERROR, undefined, toastRef);
+                    return;
+                }
+                showMessage("Something went wrong. Try again!", NoticeEnum.ERROR, undefined, toastRef)
+                return;
+            } finally {
+                setLoadings({...loadings, lastStepLoading: false});
+            }
         }
         setStep((s) => Math.min(s + 1, 2));
     };
 
-    const prev = () => setStep((s) => Math.max(s - 1, 0));
+    const prev = () => setStep((s) => {
+        if (s === 1) {
+            setVerificationCode(["", "", "", "", "", ""]);
+            setVerificationError("");
+        } else if (s === 2) {
+            profileForm.reset();
+            setVerificationCode(["", "", "", "", "", ""]);
+            setVerificationError("");
+        }
+
+        return Math.max(s - 1, 0);
+    });
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-4">
@@ -135,9 +224,8 @@ export default function RegisterPage() {
                 <CardHeader className="space-y-4">
                     <div className="flex justify-between items-center">
                         <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
-                        <ThemeToggle />
+                        <ThemeToggle/>
                     </div>
-
                     {/* Step Indicator */}
                     <div className="flex justify-between items-center relative">
                         {steps.map((s, i) => (
@@ -154,7 +242,7 @@ export default function RegisterPage() {
                         <div className="absolute top-4 left-0 right-0 h-0.5 bg-muted">
                             <div
                                 className="h-full bg-primary transition-all duration-300"
-                                style={{ width: `${(step / (steps.length - 1)) * 100}%` }}
+                                style={{width: `${(step / (steps.length - 1)) * 100}%`}}
                             />
                         </div>
                     </div>
@@ -259,16 +347,20 @@ export default function RegisterPage() {
                     {step != 0 && <Button
                         variant="ghost"
                         onClick={prev}
-                        disabled={step === 0}
+                        disabled={step === 0 || loadings.sendVerificationCodeLoading || loadings.verifyCodeLoading || loadings.lastStepLoading}
                         className="h-10"
                     >
                         Back
                     </Button>}
                     <Button
+                        disabled={loadings.sendVerificationCodeLoading || loadings.verifyCodeLoading || loadings.lastStepLoading}
                         onClick={next}
                         className="h-10"
                     >
                         {step < 2 ? "Next" : "Complete"}
+                        {loadings.sendVerificationCodeLoading || loadings.verifyCodeLoading || loadings.lastStepLoading ? (<>
+                            <Spinner/>
+                        </>) : null}
                     </Button>
                 </CardFooter>
             </Card>
