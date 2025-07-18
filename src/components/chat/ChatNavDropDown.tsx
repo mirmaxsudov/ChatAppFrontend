@@ -2,7 +2,7 @@ import { AtSign, Moon, Pen, Sun, User, Users } from "lucide-react";
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "../ui/dropdown-menu";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { capitalizeFirstLetter } from "@/helper/Capitalize";
+import { capitalizeFirstLetter } from "@/helper/ts/Capitalize";
 
 const ChatNavDropDown = () => {
     const { theme, setTheme } = useTheme();

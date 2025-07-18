@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
-import { validateEmail } from "@/helper/EmailChecker";
+import { validateEmail } from "@/helper/ts/EmailChecker";
 
 export default function LoginPage() {
     const [formData, setFormData] = useState({

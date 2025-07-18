@@ -1,4 +1,4 @@
-import { BOTH_SIDE_READ } from "@/helper/MessageReadTypes";
+import { BOTH_SIDE_READ } from "@/helper/tsx/MessageReadTypes";
 import clsx from "clsx";
 
 const ImagesMessage = ({ imageLinks, isLeft, withCaption }: { withCaption: boolean, imageLinks: string[], isLeft: boolean }) => {
