@@ -1,7 +1,11 @@
-import { BOTH_SIDE_READ } from "@/helper/tsx/MessageReadTypes";
+import {BOTH_SIDE_READ} from "@/helper/tsx/MessageReadTypes";
 import clsx from "clsx";
 
-const ImagesMessage = ({ imageLinks, isLeft, withCaption }: { withCaption: boolean, imageLinks: string[], isLeft: boolean }) => {
+const ImagesMessage = ({imageLinks, isLeft, withCaption}: {
+    withCaption: boolean,
+    imageLinks: string[],
+    isLeft: boolean
+}) => {
     const len = imageLinks.length;
 
     if (len === 0)
@@ -9,28 +13,24 @@ const ImagesMessage = ({ imageLinks, isLeft, withCaption }: { withCaption: boole
 
     return <>
         <div className={clsx("", [
-            { "flex justify-end ": !isLeft && !withCaption }
+            {"flex justify-end ": !isLeft && !withCaption}
         ])}>
             <div className={clsx("max-w-[426px] max-h-[446px] rounded-[20px]", [
-                { "bg-[#E9EAED] dark:bg-[#23262F]": isLeft },
-                { "bg-[#E0F0FF] dark:bg-[#001A3D]": !isLeft },
-                { "my-[4px]": !withCaption }
+                {"bg-[#E9EAED] dark:bg-[#23262F]": isLeft},
+                {"bg-[#E0F0FF] dark:bg-[#001A3D]": !isLeft},
+                {"my-[4px]": !withCaption}
             ])}>
                 <div className="max-h-[426px]">
-                    {/* {len !== 3 && <> */}
                     <div className={clsx("grid gap-[4px] size-full", [
-                        { "grid-cols-1 grid-rows-1": len === 1 },
-                        { "grid-cols-2 grid-rows-1": len === 2 },
-                        { "grid-cols-2 grid-rows-1": len === 3 },
-                        { "grid-cols-2 grid-rows-2": len >= 4 },
+                        {"grid-cols-1 grid-rows-1": len === 1},
+                        {"grid-cols-2 grid-rows-1": len === 2},
+                        {"grid-cols-2 grid-rows-1": len === 3},
+                        {"grid-cols-2 grid-rows-2": len >= 4},
                     ])}>
                         {imageLinks.slice(0, 4).map((link, index) => {
-                            return <>
-                                <ImageItem key={index} link={link} index={index + 1} count={len} />
-                            </>
+                            return <ImageItem key={link} link={link} index={index + 1} count={len}/>
                         })}
                     </div>
-                    {/* </>} */}
                 </div>
                 {!withCaption && <>
                     <div className="flex mt-[4px] pr-[10px] pb-[4px] items-center justify-end gap-[5px]">
@@ -67,12 +67,12 @@ const getBorderRadius = (index: number, count: number) => {
     return "";
 };
 
-const ImageItem = ({ link, index, count }: { link: string, index: number, count: number }) => {
+const ImageItem = ({link, index, count}: { link: string, index: number, count: number }) => {
     return (
         <div
             className={clsx(
                 "w-auto " + getBorderRadius(index, count),
-                { "col-span-2 row-start-2": index === 3 && count === 3 }
+                {"col-span-2 row-start-2": index === 3 && count === 3}
             )}
         >
             {(count > 4 && index === 4) ? (
@@ -90,7 +90,7 @@ const ImageItem = ({ link, index, count }: { link: string, index: number, count:
                     <p className="relative z-10 text-white">{count}+</p>
                 </div>
             ) : (
-                <img className="w-full h-full object-cover border-radius" src={link} alt={link} />
+                <img className="w-full h-full object-cover border-radius" src={link} alt={link}/>
             )}
         </div>
     );

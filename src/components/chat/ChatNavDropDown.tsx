@@ -1,42 +1,93 @@
-import { AtSign, Moon, Pen, Sun, User, Users } from "lucide-react";
-import { DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "../ui/dropdown-menu";
+"use client";
+
+import {
+    AtSign,
+    Moon,
+    Pen,
+    SaveAll,
+    Settings,
+    Sun,
+    User,
+    Users,
+    UsersRound,
+} from "lucide-react";
+import {
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubTrigger,
+    DropdownMenuSubContent,
+} from "../ui/dropdown-menu";
 import Link from "next/link";
-import { useTheme } from "next-themes";
-import { capitalizeFirstLetter } from "@/helper/ts/Capitalize";
+import {useTheme} from "next-themes";
+import {capitalizeFirstLetter} from "@/helper/ts/Capitalize";
+import useUser from "@/store/useUser";
+import NewMessageModal from "@/components/chat/modal/NewMessageModal";
 
 const ChatNavDropDown = () => {
-    const { theme, setTheme } = useTheme();
+    const {theme, setTheme} = useTheme();
+    const user = useUser((state) => state.user);
 
     return (
         <>
-            <DropdownMenuContent className="dark:bg-[#23262F]">
+            <DropdownMenuContent className="dark:bg-[#0F172B]">
                 <DropdownMenuItem>
-                    <Link href={"/profile"} className="flex items-center justify-between gap-[10px]">
-                        <img className="rounded" width={30} height={30} src={"https://wallpapers.com/images/featured/pretty-profile-pictures-6x5bfef0mhb60qyl.jpg"} alt="Image" />
-                        <h4>Abdurahmon Mirmaxsudov</h4>
+                    <Link
+                        href="/profile"
+                        className="flex items-center justify-between gap-2"
+                    >
+                        <img
+                            className="rounded"
+                            width={30}
+                            height={30}
+                            src="https://wallpapers.com/images/featured/pretty-profile-pictures-6x5bfef0mhb60qyl.jpg"
+                            alt="Profile"
+                        />
+                        <span>
+            {user?.firstName} {user?.lastname}
+          </span>
                     </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator/>
                 <DropdownMenuItem>
-                    <AtSign /> <p>Mentions</p>
+                    <AtSign/> Mentions
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <Pen />
-                    New Direct Message
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <Users />
-                    New Group
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
-                    {theme === "light" ? <Moon /> : <Sun />}
+                <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                        <SaveAll width={16} className={"text-[#8292A8] mr-[5px]"}/> Messages
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent className="dark:bg-[#0F172B]">
+                        <DropdownMenuItem>
+                            <Pen/> New Direct Message
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            <Users/> New Group
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            <UsersRound/> New Channel
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            <SaveAll/> Saved messages
+                        </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSeparator/>
+                <DropdownMenuItem
+                    onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                >
+                    {theme === "light" ? <Moon/> : <Sun/>}
                     {capitalizeFirstLetter(theme as string)} Mode
                 </DropdownMenuItem>
+                <DropdownMenuSeparator/>
                 <DropdownMenuItem>
-                    <User />
-                    Sign out
+                    <Settings/> Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                    <User/> Sign out
                 </DropdownMenuItem>
             </DropdownMenuContent>
+            <NewMessageModal/>
         </>
     );
 };
