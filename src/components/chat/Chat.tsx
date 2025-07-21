@@ -5,7 +5,7 @@ import ChatHeader from "./ChatHeader";
 const Chat = () => {
     return <>
         <div className="relative">
-            <ChatHeader />
+            <ChatHeader/>
         </div>
     </>
 }
