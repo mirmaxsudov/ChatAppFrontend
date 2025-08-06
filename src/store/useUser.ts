@@ -14,6 +14,7 @@ const useUser = create<UserZustandType>((set, get) => {
         setUser: (user) => {
             set({user: {...user}});
             Cookies.set("user", JSON.stringify(user), {secure: true, sameSite: "lax"});
+            Cookies.set("token", user.accessToken, {secure: true, sameSite: "lax"});
         },
         clearUser: () => {
             set({user: null});

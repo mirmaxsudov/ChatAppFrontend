@@ -1,5 +1,4 @@
 import ChatNav from "./ChatNav";
-import OwnProfile from "@/components/chat/modal/profile/OwnProfile";
 
 const ChatList = ({width}: { width: number }) => {
     return (
@@ -12,7 +11,6 @@ const ChatList = ({width}: { width: number }) => {
                     </>
                 </div>
             </div>
-            <OwnProfile/>
         </div>
     );
 };

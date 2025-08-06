@@ -1,0 +1,1 @@
+const BASE_URL: string = "/api/v1/chat";
