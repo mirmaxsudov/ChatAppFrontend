@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import {useState, useEffect} from "react";
 import {
     Dialog,
     DialogContent,
@@ -8,12 +8,12 @@ import {
     DialogTitle,
     DialogDescription,
 } from "@/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import {Tabs, TabsList, TabsTrigger, TabsContent} from "@/components/ui/tabs";
+import {Avatar, AvatarImage, AvatarFallback} from "@/components/ui/avatar";
+import {Input} from "@/components/ui/input";
+import {Textarea} from "@/components/ui/textarea";
+import {Label} from "@/components/ui/label";
+import {Switch} from "@/components/ui/switch";
 import {
     Select,
     SelectTrigger,
@@ -21,8 +21,8 @@ import {
     SelectContent,
     SelectItem,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { useTheme } from "next-themes";
+import {Button} from "@/components/ui/button";
+import {useTheme} from "next-themes";
 import {
     User as UserIcon,
     Lock,
@@ -89,19 +89,19 @@ import {
     FileX,
     FileDigit,
 } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
-import { formatBytes } from "@/lib/utils";
+import {Slider} from "@/components/ui/slider";
+import {Progress} from "@/components/ui/progress";
+import {Badge} from "@/components/ui/badge";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Collapsible, CollapsibleTrigger, CollapsibleContent} from "@/components/ui/collapsible";
+import {formatBytes} from "@/lib/utils";
 
 type OwnProfileProps = {
     open: boolean;
     setOpen: (open: boolean) => void;
 }
 
-export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
+export default function OwnProfile({open, setOpen}: OwnProfileProps) {
     type TabKey =
         | "profile"
         | "account"
@@ -114,7 +114,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
         | "advanced";
 
     const [tab, setTab] = useState<TabKey>("profile");
-    const { theme, setTheme } = useTheme();
+    const {theme, setTheme} = useTheme();
     const [fontSize, setFontSize] = useState(16);
     const [passcodeLock, setPasscodeLock] = useState(false);
     const [autoLockTimer, setAutoLockTimer] = useState("1m");
@@ -166,8 +166,8 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
         cache: "30d",
     });
     const [paymentMethods, setPaymentMethods] = useState([
-        { id: "1", type: "visa", last4: "4242", expiry: "12/24" },
-        { id: "2", type: "paypal", email: "john@example.com" },
+        {id: "1", type: "visa", last4: "4242", expiry: "12/24"},
+        {id: "2", type: "paypal", email: "john@example.com"},
     ]);
     const [subscriptionStatus, setSubscriptionStatus] = useState({
         plan: "Premium",
@@ -176,13 +176,13 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
         features: ["No Ads", "Premium Badge", "Advanced Chat Features"],
     });
     const [apiKeys, setApiKeys] = useState([
-        { id: "1", name: "Web App", key: "sk_*****dEf", created: "2023-01-15", lastUsed: "2023-10-20" },
-        { id: "2", name: "Mobile API", key: "sk_*****AbC", created: "2023-03-22", lastUsed: "2023-10-18" },
+        {id: "1", name: "Web App", key: "sk_*****dEf", created: "2023-01-15", lastUsed: "2023-10-20"},
+        {id: "2", name: "Mobile API", key: "sk_*****AbC", created: "2023-03-22", lastUsed: "2023-10-18"},
     ]);
     const [integrationSettings, setIntegrationSettings] = useState([
-        { id: "1", name: "Google Drive", connected: true, lastSynced: "2 hours ago" },
-        { id: "2", name: "Dropbox", connected: false, lastSynced: "Never" },
-        { id: "3", name: "Slack", connected: true, lastSynced: "5 minutes ago" },
+        {id: "1", name: "Google Drive", connected: true, lastSynced: "2 hours ago"},
+        {id: "2", name: "Dropbox", connected: false, lastSynced: "Never"},
+        {id: "3", name: "Slack", connected: true, lastSynced: "5 minutes ago"},
     ]);
     const [advancedSettings, setAdvancedSettings] = useState({
         hardwareAcceleration: true,
@@ -314,14 +314,14 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
     const toggleIntegration = (id: string) => {
         setIntegrationSettings(integrationSettings.map(int =>
-            int.id === id ? { ...int, connected: !int.connected } : int
+            int.id === id ? {...int, connected: !int.connected} : int
         ));
     };
 
     const addPaymentMethod = () => {
         setPaymentMethods([
             ...paymentMethods,
-            { id: `${paymentMethods.length + 1}`, type: "mastercard", last4: "5678", expiry: "06/25" }
+            {id: `${paymentMethods.length + 1}`, type: "mastercard", last4: "5678", expiry: "06/25"}
         ]);
     };
 
@@ -373,39 +373,39 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                 >
                     <TabsList className="grid grid-cols-9 min-w-max">
                         <TabsTrigger value="profile">
-                            <UserIcon className="mr-1 inline-block size-4" />
+                            <UserIcon className="mr-1 inline-block size-4"/>
                             Profile
                         </TabsTrigger>
                         <TabsTrigger value="account">
-                            <Lock className="mr-1 inline-block size-4" />
+                            <Lock className="mr-1 inline-block size-4"/>
                             Account
                         </TabsTrigger>
                         <TabsTrigger value="privacy">
-                            <Eye className="mr-1 inline-block size-4" />
+                            <Eye className="mr-1 inline-block size-4"/>
                             Privacy
                         </TabsTrigger>
                         <TabsTrigger value="notifications">
-                            <Bell className="mr-1 inline-block size-4" />
+                            <Bell className="mr-1 inline-block size-4"/>
                             Notifications
                         </TabsTrigger>
                         <TabsTrigger value="appearance">
-                            <Palette className="mr-1 inline-block size-4" />
+                            <Palette className="mr-1 inline-block size-4"/>
                             Appearance
                         </TabsTrigger>
                         <TabsTrigger value="chat">
-                            <MessageCircle className="mr-1 inline-block size-4" />
+                            <MessageCircle className="mr-1 inline-block size-4"/>
                             Chat
                         </TabsTrigger>
                         <TabsTrigger value="storage">
-                            <Database className="mr-1 inline-block size-4" />
+                            <Database className="mr-1 inline-block size-4"/>
                             Storage
                         </TabsTrigger>
                         <TabsTrigger value="security">
-                            <ShieldCheck className="mr-1 inline-block size-4" />
+                            <ShieldCheck className="mr-1 inline-block size-4"/>
                             Security
                         </TabsTrigger>
                         <TabsTrigger value="advanced">
-                            <Wrench className="mr-1 inline-block size-4" />
+                            <Wrench className="mr-1 inline-block size-4"/>
                             Advanced
                         </TabsTrigger>
                     </TabsList>
@@ -415,13 +415,13 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                         <div className="flex items-center gap-4">
                             <div className="relative">
                                 <Avatar className="size-24 border-2 border-primary">
-                                    <AvatarImage src="/avatar.png" alt="avatar" />
+                                    <AvatarImage src="/avatar.png" alt="avatar"/>
                                     <AvatarFallback>JD</AvatarFallback>
                                 </Avatar>
                                 {isPremium && (
                                     <div
                                         className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-500 to-yellow-300 rounded-full p-1">
-                                        <BadgeCheck className="size-5 text-white" />
+                                        <BadgeCheck className="size-5 text-white"/>
                                     </div>
                                 )}
                             </div>
@@ -429,12 +429,12 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                 <div className="flex items-center gap-2">
                                     <Button>Change Avatar</Button>
                                     <Button variant="outline">
-                                        <ImageIcon className="mr-2 size-4" />
+                                        <ImageIcon className="mr-2 size-4"/>
                                         Edit Profile Photo
                                     </Button>
                                 </div>
                                 <Button variant="outline">
-                                    <QrCode className="mr-2 size-4" />
+                                    <QrCode className="mr-2 size-4"/>
                                     Share Profile QR
                                 </Button>
                             </div>
@@ -443,20 +443,20 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <Label htmlFor="firstName">First Name</Label>
-                                <Input id="firstName" defaultValue="John" />
+                                <Input id="firstName" defaultValue="John"/>
                             </div>
                             <div>
                                 <Label htmlFor="lastName">Last Name</Label>
-                                <Input id="lastName" defaultValue="Doe" />
+                                <Input id="lastName" defaultValue="Doe"/>
                             </div>
                         </div>
 
                         <div>
                             <Label htmlFor="username">Username</Label>
                             <div className="flex gap-2">
-                                <Input id="username" defaultValue="john_doe" className="flex-1" />
+                                <Input id="username" defaultValue="john_doe" className="flex-1"/>
                                 <Button variant="outline" size="sm">
-                                    <RefreshCw className="mr-1 size-4" />
+                                    <RefreshCw className="mr-1 size-4"/>
                                     Check Availability
                                 </Button>
                             </div>
@@ -468,21 +468,21 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                         <div>
                             <Label htmlFor="email">Email</Label>
                             <div className="flex gap-2">
-                                <Input id="email" type="email" defaultValue="john@example.com" className="flex-1" />
+                                <Input id="email" type="email" defaultValue="john@example.com" className="flex-1"/>
                                 <Button variant="outline" size="sm">
-                                    <RefreshCw className="mr-1 size-4" />
+                                    <RefreshCw className="mr-1 size-4"/>
                                     Verify
                                 </Button>
                             </div>
                             <div className="flex items-center mt-1 text-xs text-green-500">
-                                <CheckCircle className="mr-1 size-4" />
+                                <CheckCircle className="mr-1 size-4"/>
                                 <span>Verified</span>
                             </div>
                         </div>
 
                         <div>
                             <Label htmlFor="phone">Phone Number</Label>
-                            <Input id="phone" type="tel" defaultValue="+998 90 123 4567" />
+                            <Input id="phone" type="tel" defaultValue="+998 90 123 4567"/>
                             <p className="text-xs text-muted-foreground mt-1">
                                 This phone number is connected to your account
                             </p>
@@ -505,10 +505,10 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                 <Label>Profile Badges</Label>
                                 <div className="flex gap-2 mt-2">
                                     <Badge variant="default" className="flex items-center gap-1">
-                                        <BadgeCheck className="size-4" /> Premium
+                                        <BadgeCheck className="size-4"/> Premium
                                     </Badge>
                                     <Badge variant="secondary" className="flex items-center gap-1">
-                                        <Calendar className="size-4" /> Member since 2021
+                                        <Calendar className="size-4"/> Member since 2021
                                     </Badge>
                                 </div>
                             </div>
@@ -516,7 +516,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                 <Label>Profile Theme</Label>
                                 <div className="flex gap-2 mt-2">
                                     <Button variant="outline" size="sm">
-                                        <Palette className="mr-2 size-4" />
+                                        <Palette className="mr-2 size-4"/>
                                         Customize
                                     </Button>
                                 </div>
@@ -525,7 +525,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
                         <div className="flex justify-between">
                             <Button variant="outline">
-                                <History className="mr-2 size-4" />
+                                <History className="mr-2 size-4"/>
                                 View Edit History
                             </Button>
                             <Button variant="default">Save Profile</Button>
@@ -537,7 +537,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
-                                    <CircleDollarSign className="size-5" />
+                                    <CircleDollarSign className="size-5"/>
                                     Premium Subscription
                                 </CardTitle>
                             </CardHeader>
@@ -561,7 +561,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                     <div className="grid grid-cols-2 gap-2">
                                         {subscriptionStatus.features.map((feature, index) => (
                                             <div key={index} className="flex items-center">
-                                                <CheckCircle className="size-4 text-green-500 mr-2" />
+                                                <CheckCircle className="size-4 text-green-500 mr-2"/>
                                                 <span className="text-sm">{feature}</span>
                                             </div>
                                         ))}
@@ -572,27 +572,27 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
                         <div className="border rounded-lg p-4">
                             <h3 className="font-medium flex items-center gap-2">
-                                <CreditCard className="size-5" />
+                                <CreditCard className="size-5"/>
                                 Payment Methods
                             </h3>
                             <div className="mt-4 space-y-3">
                                 {paymentMethods.map(method => (
                                     <div key={method.id}
-                                        className="flex items-center justify-between border rounded p-3">
+                                         className="flex items-center justify-between border rounded p-3">
                                         <div className="flex items-center gap-3">
                                             {method.type === "visa" && (
                                                 <div className="bg-blue-500 text-white p-1 rounded">
-                                                    <CreditCard className="size-5" />
+                                                    <CreditCard className="size-5"/>
                                                 </div>
                                             )}
                                             {method.type === "paypal" && (
                                                 <div className="bg-blue-700 text-white p-1 rounded">
-                                                    <Wallet className="size-5" />
+                                                    <Wallet className="size-5"/>
                                                 </div>
                                             )}
                                             {method.type === "mastercard" && (
                                                 <div className="bg-red-500 text-white p-1 rounded">
-                                                    <CreditCard className="size-5" />
+                                                    <CreditCard className="size-5"/>
                                                 </div>
                                             )}
                                             <div>
@@ -607,12 +607,12 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                             size="icon"
                                             onClick={() => removePaymentMethod(method.id)}
                                         >
-                                            <X className="size-4" />
+                                            <X className="size-4"/>
                                         </Button>
                                     </div>
                                 ))}
                                 <Button variant="outline" className="w-full mt-2" onClick={addPaymentMethod}>
-                                    <Plus className="mr-2 size-4" />
+                                    <Plus className="mr-2 size-4"/>
                                     Add Payment Method
                                 </Button>
                             </div>
@@ -620,7 +620,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
                         <div className="border rounded-lg p-4">
                             <h3 className="font-medium flex items-center gap-2">
-                                <Key className="mr-1 size-5" />
+                                <Key className="mr-1 size-5"/>
                                 Login & Security
                             </h3>
                             <div className="mt-4 space-y-4">
@@ -634,7 +634,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                 </div>
                                 <div>
                                     <Label htmlFor="newPassword">New Password</Label>
-                                    <Input id="newPassword" type="password" placeholder="••••••••" />
+                                    <Input id="newPassword" type="password" placeholder="••••••••"/>
                                 </div>
                                 <div>
                                     <Label htmlFor="confirmPassword">Confirm Password</Label>
@@ -650,20 +650,20 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
                         <div className="border rounded-lg p-4">
                             <h3 className="font-medium flex items-center gap-2">
-                                <Globe className="mr-1 size-5" />
+                                <Globe className="mr-1 size-5"/>
                                 Account Actions
                             </h3>
                             <div className="mt-4 space-y-3">
                                 <Button variant="outline" className="w-full">
-                                    <QrCode className="mr-2 size-4" />
+                                    <QrCode className="mr-2 size-4"/>
                                     Set Up Login QR Code
                                 </Button>
                                 <Button variant="outline" className="w-full">
-                                    <UserPlus className="mr-2 size-4" />
+                                    <UserPlus className="mr-2 size-4"/>
                                     Add Account
                                 </Button>
                                 <Button variant="destructive" className="w-full">
-                                    <Trash className="mr-2 size-4" />
+                                    <Trash className="mr-2 size-4"/>
                                     Delete Account
                                 </Button>
                                 <div className="text-xs text-muted-foreground mt-2">
@@ -687,7 +687,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                                 Let others see when you're online
                                             </p>
                                         </div>
-                                        <Switch defaultChecked />
+                                        <Switch defaultChecked/>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <div>
@@ -696,7 +696,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                                 Allow read receipts in chats
                                             </p>
                                         </div>
-                                        <Switch defaultChecked />
+                                        <Switch defaultChecked/>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <div>
@@ -705,7 +705,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                                 Automatically sync your device contacts
                                             </p>
                                         </div>
-                                        <Switch checked={contactSync} onCheckedChange={setContactSync} />
+                                        <Switch checked={contactSync} onCheckedChange={setContactSync}/>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <div>
@@ -714,7 +714,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                                 Automatically translate messages
                                             </p>
                                         </div>
-                                        <Switch checked={messageTranslation} onCheckedChange={setMessageTranslation} />
+                                        <Switch checked={messageTranslation} onCheckedChange={setMessageTranslation}/>
                                     </div>
                                 </div>
                             </div>
@@ -726,7 +726,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                         <Label>Who can see my phone number</Label>
                                         <Select value={phonePrivacy} onValueChange={setPhonePrivacy}>
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select" />
+                                                <SelectValue placeholder="Select"/>
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="everyone">Everyone</SelectItem>
@@ -740,7 +740,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                         <Label>Who can see my email</Label>
                                         <Select value={emailPrivacy} onValueChange={setEmailPrivacy}>
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select" />
+                                                <SelectValue placeholder="Select"/>
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="everyone">Everyone</SelectItem>
@@ -754,7 +754,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                         <Label>Who can see my last seen</Label>
                                         <Select value={presencePrivacy} onValueChange={setPresencePrivacy}>
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select" />
+                                                <SelectValue placeholder="Select"/>
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="everyone">Everyone</SelectItem>
@@ -774,7 +774,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                     <Label>Who can add me to groups</Label>
                                     <Select value={groupPrivacy} onValueChange={setGroupPrivacy}>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select" />
+                                            <SelectValue placeholder="Select"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="everyone">Everyone</SelectItem>
@@ -788,7 +788,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                     <Label>Forwarded message privacy</Label>
                                     <Select value={forwardPrivacy} onValueChange={setForwardPrivacy}>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select" />
+                                            <SelectValue placeholder="Select"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="everyone">Everyone</SelectItem>
@@ -801,7 +801,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                     <Label>Who can call me</Label>
                                     <Select value={callPrivacy} onValueChange={setCallPrivacy}>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select" />
+                                            <SelectValue placeholder="Select"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="everyone">Everyone</SelectItem>
@@ -815,7 +815,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                     <Label>Typing indicators</Label>
                                     <Select value={typingPrivacy} onValueChange={setTypingPrivacy}>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select" />
+                                            <SelectValue placeholder="Select"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="everyone">Show to everyone</SelectItem>
@@ -842,11 +842,11 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
                         <div className="flex justify-between">
                             <Button variant="outline">
-                                <Users className="mr-2 size-4" />
+                                <Users className="mr-2 size-4"/>
                                 Manage Blocked Users
                             </Button>
                             <Button variant="destructive">
-                                <Trash className="mr-2 size-4" />
+                                <Trash className="mr-2 size-4"/>
                                 Clear All Chat History
                             </Button>
                         </div>
@@ -864,7 +864,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                             Alert me about new messages
                                         </p>
                                     </div>
-                                    <Switch defaultChecked />
+                                    <Switch defaultChecked/>
                                 </div>
 
                                 <div className="flex items-center justify-between">
@@ -874,7 +874,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                             Notify me about group activity
                                         </p>
                                     </div>
-                                    <Switch defaultChecked />
+                                    <Switch defaultChecked/>
                                 </div>
 
                                 <div className="flex items-center justify-between">
@@ -884,7 +884,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                             Alert me about incoming calls
                                         </p>
                                     </div>
-                                    <Switch defaultChecked />
+                                    <Switch defaultChecked/>
                                 </div>
 
                                 <div className="flex items-center justify-between">
@@ -894,7 +894,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                             Show message content in notifications
                                         </p>
                                     </div>
-                                    <Switch defaultChecked />
+                                    <Switch defaultChecked/>
                                 </div>
 
                                 <div className="flex items-center justify-between">
@@ -920,7 +920,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                         <Label>Notification sound</Label>
                                         <Select value={notificationSound} onValueChange={setNotificationSound}>
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select sound" />
+                                                <SelectValue placeholder="Select sound"/>
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="default">Default</SelectItem>
@@ -936,7 +936,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                         <Label>Message sound</Label>
                                         <Select value={messageSound} onValueChange={setMessageSound}>
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select sound" />
+                                                <SelectValue placeholder="Select sound"/>
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="default">Default</SelectItem>
@@ -952,7 +952,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                         <Label>Call ringtone</Label>
                                         <Select value={callSound} onValueChange={setCallSound}>
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select ringtone" />
+                                                <SelectValue placeholder="Select ringtone"/>
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="ringtone">Default Ringtone</SelectItem>
@@ -980,7 +980,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                     <div>
                                         <Label>Volume</Label>
                                         <div className="flex items-center gap-3 mt-2">
-                                            <VolumeX className="size-4 text-muted-foreground" />
+                                            <VolumeX className="size-4 text-muted-foreground"/>
                                             <Slider
                                                 defaultValue={[volume]}
                                                 min={0}
@@ -989,7 +989,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                                 onValueChange={handleVolumeChange}
                                                 className="flex-1"
                                             />
-                                            <Volume2 className="size-4 text-muted-foreground" />
+                                            <Volume2 className="size-4 text-muted-foreground"/>
                                         </div>
                                         <p className="text-xs text-muted-foreground mt-1">
                                             Current volume: {volume}%
@@ -1008,7 +1008,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                                 Notify me outside the app
                                             </p>
                                         </div>
-                                        <Switch defaultChecked />
+                                        <Switch defaultChecked/>
                                     </div>
 
                                     <div className="flex items-center justify-between">
@@ -1018,7 +1018,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                                 Send daily summary emails
                                             </p>
                                         </div>
-                                        <Switch defaultChecked />
+                                        <Switch defaultChecked/>
                                     </div>
 
                                     <div className="flex items-center justify-between">
@@ -1028,7 +1028,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                                 Push notifications to your phone
                                             </p>
                                         </div>
-                                        <Switch defaultChecked />
+                                        <Switch defaultChecked/>
                                     </div>
 
                                     <div className="flex items-center justify-between">
@@ -1040,7 +1040,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                         </div>
                                         <Select defaultValue="all">
                                             <SelectTrigger className="w-32">
-                                                <SelectValue placeholder="All" />
+                                                <SelectValue placeholder="All"/>
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="all">All</SelectItem>
@@ -1095,9 +1095,9 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                         }}
                                     >
                                         {theme === "light" ? (
-                                            <Moon className="mr-1 size-4" />
+                                            <Moon className="mr-1 size-4"/>
                                         ) : (
-                                            <Sun className="mr-1 size-4" />
+                                            <Sun className="mr-1 size-4"/>
                                         )}
                                         {theme === "light" ? "Dark" : "Light"}
                                     </Button>
@@ -1134,7 +1134,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                     <Label>Accent Color</Label>
                                     <Select value={themeAccent} onValueChange={setThemeAccent}>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Default" />
+                                            <SelectValue placeholder="Default"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="default">Default</SelectItem>
@@ -1168,7 +1168,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                     <Label>Chat Density</Label>
                                     <Select value={chatDensity} onValueChange={setChatDensity}>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Normal" />
+                                            <SelectValue placeholder="Normal"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="compact">Compact</SelectItem>
@@ -1188,7 +1188,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                         </p>
                                     </div>
                                     <Button variant="outline">
-                                        <ImageIcon className="mr-2 size-4" />
+                                        <ImageIcon className="mr-2 size-4"/>
                                         Change
                                     </Button>
                                 </div>
@@ -1197,7 +1197,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                     <Label>Background Image</Label>
                                     <Select value={backgroundImage} onValueChange={setBackgroundImage}>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Default" />
+                                            <SelectValue placeholder="Default"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="default">Default</SelectItem>
@@ -1213,7 +1213,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                     <Label>Message Bubble Style</Label>
                                     <Select value={messageBubble} onValueChange={setMessageBubble}>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Rounded" />
+                                            <SelectValue placeholder="Rounded"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="rounded">Rounded</SelectItem>
@@ -1228,7 +1228,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                     <Label>Emoji Set</Label>
                                     <Select value={emojiSet} onValueChange={setEmojiSet}>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Apple" />
+                                            <SelectValue placeholder="Apple"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="apple">Apple</SelectItem>
@@ -1243,9 +1243,9 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                 <div>
                                     <Label>Animation Intensity</Label>
                                     <Select value={animationIntensity.toString()}
-                                        onValueChange={(val) => setAnimationIntensity(parseInt(val))}>
+                                            onValueChange={(val) => setAnimationIntensity(parseInt(val))}>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Medium" />
+                                            <SelectValue placeholder="Medium"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="0">None</SelectItem>
@@ -1284,7 +1284,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                             Show "user is typing" status
                                         </p>
                                     </div>
-                                    <Switch defaultChecked />
+                                    <Switch defaultChecked/>
                                 </div>
 
                                 <div className="flex items-center justify-between">
@@ -1294,7 +1294,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                             Display time on each message
                                         </p>
                                     </div>
-                                    <Switch defaultChecked />
+                                    <Switch defaultChecked/>
                                 </div>
 
                                 <div className="flex items-center justify-between">
@@ -1340,7 +1340,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                     <Label>Enter Key Behavior</Label>
                                     <Select value={enterKeyBehavior} onValueChange={setEnterKeyBehavior}>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Send" />
+                                            <SelectValue placeholder="Send"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="send">Send Message</SelectItem>
@@ -1353,7 +1353,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                     <Label>Draft Timeout</Label>
                                     <Select value={draftTimeout} onValueChange={setDraftTimeout}>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="15 minutes" />
+                                            <SelectValue placeholder="15 minutes"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="1m">1 Minute</SelectItem>
@@ -1483,7 +1483,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                         onValueChange={(val) => handleAutoDownloadChange("photos", val)}
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="All" />
+                                            <SelectValue placeholder="All"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="all">All</SelectItem>
@@ -1500,7 +1500,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                         onValueChange={(val) => handleAutoDownloadChange("videos", val)}
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="WiFi Only" />
+                                            <SelectValue placeholder="WiFi Only"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="all">All</SelectItem>
@@ -1517,7 +1517,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                         onValueChange={(val) => handleAutoDownloadChange("files", val)}
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="WiFi Only" />
+                                            <SelectValue placeholder="WiFi Only"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="all">All</SelectItem>
@@ -1534,7 +1534,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                         onValueChange={(val) => handleAutoDownloadChange("voice", val)}
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="All" />
+                                            <SelectValue placeholder="All"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="all">All</SelectItem>
@@ -1550,27 +1550,27 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                             <h3 className="font-medium mb-4">Additional Features</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <Button variant="outline">
-                                    <Sticker className="mr-2 size-4" />
+                                    <Sticker className="mr-2 size-4"/>
                                     Manage Stickers
                                 </Button>
                                 <Button variant="outline">
-                                    <Bot className="mr-2 size-4" />
+                                    <Bot className="mr-2 size-4"/>
                                     Bot Settings
                                 </Button>
                                 <Button variant="outline">
-                                    <Bookmark className="mr-2 size-4" />
+                                    <Bookmark className="mr-2 size-4"/>
                                     Saved Messages
                                 </Button>
                                 <Button variant="outline">
-                                    <Calendar className="mr-2 size-4" />
+                                    <Calendar className="mr-2 size-4"/>
                                     Scheduled Messages
                                 </Button>
                                 <Button variant="outline">
-                                    <Folder className="mr-2 size-4" />
+                                    <Folder className="mr-2 size-4"/>
                                     Chat Folders
                                 </Button>
                                 <Button variant="outline">
-                                    <ClipboardList className="mr-2 size-4" />
+                                    <ClipboardList className="mr-2 size-4"/>
                                     Chat Themes
                                 </Button>
                             </div>
@@ -1582,7 +1582,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
-                                    <HardDrive className="size-5" />
+                                    <HardDrive className="size-5"/>
                                     Storage Overview
                                 </CardTitle>
                             </CardHeader>
@@ -1601,7 +1601,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                     <div className="border rounded p-3">
                                         <div className="flex items-center">
-                                            <ImageIcon className="mr-2 size-4 text-blue-500" />
+                                            <ImageIcon className="mr-2 size-4 text-blue-500"/>
                                             <span className="font-medium">Media</span>
                                         </div>
                                         <p className="text-sm mt-1">{formatBytes(storageStats.media * 1024 * 1024)}</p>
@@ -1612,7 +1612,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
                                     <div className="border rounded p-3">
                                         <div className="flex items-center">
-                                            <FileText className="mr-2 size-4 text-green-500" />
+                                            <FileText className="mr-2 size-4 text-green-500"/>
                                             <span className="font-medium">Documents</span>
                                         </div>
                                         <p className="text-sm mt-1">{formatBytes(storageStats.documents * 1024 * 1024)}</p>
@@ -1623,7 +1623,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
                                     <div className="border rounded p-3">
                                         <div className="flex items-center">
-                                            <Database className="mr-2 size-4 text-yellow-500" />
+                                            <Database className="mr-2 size-4 text-yellow-500"/>
                                             <span className="font-medium">Cache</span>
                                         </div>
                                         <p className="text-sm mt-1">{formatBytes(storageStats.cache * 1024 * 1024)}</p>
@@ -1639,7 +1639,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
                                     <div className="border rounded p-3">
                                         <div className="flex items-center">
-                                            <File className="mr-2 size-4 text-purple-500" />
+                                            <File className="mr-2 size-4 text-purple-500"/>
                                             <span className="font-medium">Other</span>
                                         </div>
                                         <p className="text-sm mt-1">{formatBytes((storageStats.used - storageStats.media - storageStats.documents - storageStats.cache) * 1024 * 1024)}</p>
@@ -1662,7 +1662,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                             onValueChange={(val) => handleAutoDeleteChange("cache", val)}
                                         >
                                             <SelectTrigger>
-                                                <SelectValue placeholder="30 days" />
+                                                <SelectValue placeholder="30 days"/>
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="1d">After 1 day</SelectItem>
@@ -1680,7 +1680,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                             onValueChange={(val) => handleAutoDeleteChange("messages", val)}
                                         >
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Never" />
+                                                <SelectValue placeholder="Never"/>
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="1d">After 1 day</SelectItem>
@@ -1699,7 +1699,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                             onValueChange={(val) => handleAutoDeleteChange("account", val)}
                                         >
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Never" />
+                                                <SelectValue placeholder="Never"/>
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="1m">After 1 month</SelectItem>
@@ -1728,7 +1728,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                             onValueChange={setBackupFrequency}
                                         >
                                             <SelectTrigger className="w-32">
-                                                <SelectValue placeholder="Weekly" />
+                                                <SelectValue placeholder="Weekly"/>
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="daily">Daily</SelectItem>
@@ -1750,7 +1750,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                             onValueChange={setBackupLocation}
                                         >
                                             <SelectTrigger className="w-32">
-                                                <SelectValue placeholder="Cloud" />
+                                                <SelectValue placeholder="Cloud"/>
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="cloud">Cloud</SelectItem>
@@ -1782,11 +1782,11 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                         </div>
                                         <div className="flex gap-2">
                                             <Button variant="outline" size="sm">
-                                                <Download className="mr-1 size-4" />
+                                                <Download className="mr-1 size-4"/>
                                                 Export
                                             </Button>
                                             <Button variant="outline" size="sm">
-                                                <Upload className="mr-1 size-4" />
+                                                <Upload className="mr-1 size-4"/>
                                                 Backup Now
                                             </Button>
                                         </div>
@@ -1800,7 +1800,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 <div className="border rounded p-3">
                                     <div className="flex items-center">
-                                        <Upload className="mr-2 size-4 text-blue-500" />
+                                        <Upload className="mr-2 size-4 text-blue-500"/>
                                         <span className="font-medium">Sent</span>
                                     </div>
                                     <p className="text-sm mt-1">{formatBytes(networkUsage.sent * 1024 * 1024)}</p>
@@ -1808,7 +1808,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
                                 <div className="border rounded p-3">
                                     <div className="flex items-center">
-                                        <Download className="mr-2 size-4 text-green-500" />
+                                        <Download className="mr-2 size-4 text-green-500"/>
                                         <span className="font-medium">Received</span>
                                     </div>
                                     <p className="text-sm mt-1">{formatBytes(networkUsage.received * 1024 * 1024)}</p>
@@ -1816,7 +1816,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
                                 <div className="border rounded p-3">
                                     <div className="flex items-center">
-                                        <Phone className="mr-2 size-4 text-purple-500" />
+                                        <Phone className="mr-2 size-4 text-purple-500"/>
                                         <span className="font-medium">Calls</span>
                                     </div>
                                     <p className="text-sm mt-1">{formatBytes(networkUsage.calls * 1024 * 1024)}</p>
@@ -1824,14 +1824,14 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
                                 <div className="border rounded p-3">
                                     <div className="flex items-center">
-                                        <Calendar className="mr-2 size-4 text-amber-500" />
+                                        <Calendar className="mr-2 size-4 text-amber-500"/>
                                         <span className="font-medium">Last reset</span>
                                     </div>
                                     <p className="text-sm mt-1">{networkUsage.lastReset}</p>
                                 </div>
                             </div>
                             <Button variant="outline" className="mt-4">
-                                <RefreshCw className="mr-2 size-4" />
+                                <RefreshCw className="mr-2 size-4"/>
                                 Reset Statistics
                             </Button>
                         </div>
@@ -1843,7 +1843,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                             <div className="space-y-6">
                                 <div className="border rounded-lg p-4">
                                     <h3 className="font-medium flex items-center gap-2 mb-4">
-                                        <LockIcon className="size-5" />
+                                        <LockIcon className="size-5"/>
                                         Two-Step Verification
                                     </h3>
                                     <div className="flex items-center justify-between">
@@ -1889,7 +1889,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
                                 <div className="border rounded-lg p-4">
                                     <h3 className="font-medium flex items-center gap-2 mb-4">
-                                        <Shield className="size-5" />
+                                        <Shield className="size-5"/>
                                         Session Security
                                     </h3>
                                     <div className="space-y-4">
@@ -1913,7 +1913,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                                 onValueChange={setPasswordChangeReminder}
                                             >
                                                 <SelectTrigger>
-                                                    <SelectValue placeholder="3 months" />
+                                                    <SelectValue placeholder="3 months"/>
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="1m">1 Month</SelectItem>
@@ -1931,7 +1931,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                                 onValueChange={setSessionTimeout}
                                             >
                                                 <SelectTrigger>
-                                                    <SelectValue placeholder="30 minutes" />
+                                                    <SelectValue placeholder="30 minutes"/>
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="5m">5 Minutes</SelectItem>
@@ -1949,7 +1949,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                             <div className="space-y-6">
                                 <div className="border rounded-lg p-4">
                                     <h3 className="font-medium flex items-center gap-2 mb-4">
-                                        <Smartphone className="size-5" />
+                                        <Smartphone className="size-5"/>
                                         App Lock
                                     </h3>
                                     <div className="flex items-center justify-between">
@@ -1977,7 +1977,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                                     onValueChange={setAutoLockTimer}
                                                 >
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Select timer" />
+                                                        <SelectValue placeholder="Select timer"/>
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectItem value="immediately">Immediately</SelectItem>
@@ -1994,7 +1994,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                                         Use fingerprint or face ID
                                                     </p>
                                                 </div>
-                                                <Switch defaultChecked />
+                                                <Switch defaultChecked/>
                                             </div>
                                         </div>
                                     )}
@@ -2002,7 +2002,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
                                 <div className="border rounded-lg p-4">
                                     <h3 className="font-medium flex items-center gap-2 mb-4">
-                                        <ShieldCheck className="size-5" />
+                                        <ShieldCheck className="size-5"/>
                                         Active Sessions
                                     </h3>
                                     <div className="space-y-2">
@@ -2031,9 +2031,9 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                                     <CollapsibleTrigger
                                                         className="text-xs text-muted-foreground flex items-center mt-2">
                                                         {isSessionExpanded ? (
-                                                            <ChevronUp className="size-3 mr-1" />
+                                                            <ChevronUp className="size-3 mr-1"/>
                                                         ) : (
-                                                            <ChevronDown className="size-3 mr-1" />
+                                                            <ChevronDown className="size-3 mr-1"/>
                                                         )}
                                                         Details
                                                     </CollapsibleTrigger>
@@ -2059,32 +2059,32 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
                         <div className="border rounded-lg p-4">
                             <h3 className="font-medium flex items-center gap-2 mb-4">
-                                <Server className="size-5" />
+                                <Server className="size-5"/>
                                 Privacy & Security Tools
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                 <Button variant="outline">
-                                    <FileLock className="mr-2 size-4" />
+                                    <FileLock className="mr-2 size-4"/>
                                     Encrypted Chats
                                 </Button>
                                 <Button variant="outline">
-                                    <FileKey className="mr-2 size-4" />
+                                    <FileKey className="mr-2 size-4"/>
                                     View Security Log
                                 </Button>
                                 <Button variant="outline">
-                                    <FileBarChart className="mr-2 size-4" />
+                                    <FileBarChart className="mr-2 size-4"/>
                                     Privacy Report
                                 </Button>
                                 <Button variant="outline">
-                                    <Link className="mr-2 size-4" />
+                                    <Link className="mr-2 size-4"/>
                                     Manage Connected Websites
                                 </Button>
                                 <Button variant="outline">
-                                    <FileDigit className="mr-2 size-4" />
+                                    <FileDigit className="mr-2 size-4"/>
                                     Data Permissions
                                 </Button>
                                 <Button variant="outline">
-                                    <Shield className="mr-2 size-4" />
+                                    <Shield className="mr-2 size-4"/>
                                     Privacy Settings Review
                                 </Button>
                             </div>
@@ -2095,7 +2095,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                     <TabsContent value="advanced" className="space-y-6 p-4">
                         <div className="border rounded-lg p-4">
                             <h3 className="font-medium flex items-center gap-2 mb-4">
-                                <Terminal className="size-5" />
+                                <Terminal className="size-5"/>
                                 Developer Settings
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -2174,7 +2174,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                         })}
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Info" />
+                                            <SelectValue placeholder="Info"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="error">Error</SelectItem>
@@ -2190,7 +2190,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
                         <div className="border rounded-lg p-4">
                             <h3 className="font-medium flex items-center gap-2 mb-4">
-                                <Webhook className="size-5" />
+                                <Webhook className="size-5"/>
                                 API & Integrations
                             </h3>
                             <div className="space-y-4">
@@ -2199,7 +2199,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                     <div className="mt-2 space-y-2">
                                         {apiKeys.map(key => (
                                             <div key={key.id}
-                                                className="flex items-center justify-between border rounded p-3">
+                                                 className="flex items-center justify-between border rounded p-3">
                                                 <div>
                                                     <p className="font-medium">{key.name}</p>
                                                     <p className="text-xs text-muted-foreground">
@@ -2211,12 +2211,12 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                                     size="icon"
                                                     onClick={() => revokeApiKey(key.id)}
                                                 >
-                                                    <X className="size-4" />
+                                                    <X className="size-4"/>
                                                 </Button>
                                             </div>
                                         ))}
                                         <Button variant="outline" className="w-full mt-2">
-                                            <Plus className="mr-2 size-4" />
+                                            <Plus className="mr-2 size-4"/>
                                             Create New API Key
                                         </Button>
                                     </div>
@@ -2227,7 +2227,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                     <div className="mt-2 space-y-2">
                                         {integrationSettings.map(int => (
                                             <div key={int.id}
-                                                className="flex items-center justify-between border rounded p-3">
+                                                 className="flex items-center justify-between border rounded p-3">
                                                 <div>
                                                     <p className="font-medium">{int.name}</p>
                                                     <p className="text-xs text-muted-foreground">
@@ -2241,7 +2241,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                             </div>
                                         ))}
                                         <Button variant="outline" className="w-full mt-2">
-                                            <Plus className="mr-2 size-4" />
+                                            <Plus className="mr-2 size-4"/>
                                             Connect New Service
                                         </Button>
                                     </div>
@@ -2251,7 +2251,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
                         <div className="border rounded-lg p-4">
                             <h3 className="font-medium flex items-center gap-2 mb-4">
-                                <GitBranch className="size-5" />
+                                <GitBranch className="size-5"/>
                                 Version & Updates
                             </h3>
                             <div className="space-y-3">
@@ -2268,7 +2268,7 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
                                     <span className="font-medium">Stable</span>
                                 </div>
                                 <Button className="w-full mt-4">
-                                    <RefreshCw className="mr-2 size-4" />
+                                    <RefreshCw className="mr-2 size-4"/>
                                     Check for Updates
                                 </Button>
                             </div>
@@ -2276,32 +2276,32 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
                         <div className="border rounded-lg p-4">
                             <h3 className="font-medium flex items-center gap-2 mb-4">
-                                <Wrench className="size-5" />
+                                <Wrench className="size-5"/>
                                 Advanced Tools
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <Button variant="outline">
-                                    <FileCode className="mr-2 size-4" />
+                                    <FileCode className="mr-2 size-4"/>
                                     Debug Console
                                 </Button>
                                 <Button variant="outline">
-                                    <FileSearch className="mr-2 size-4" />
+                                    <FileSearch className="mr-2 size-4"/>
                                     Media Inspector
                                 </Button>
                                 <Button variant="outline">
-                                    <FileSpreadsheet className="mr-2 size-4" />
+                                    <FileSpreadsheet className="mr-2 size-4"/>
                                     Database Explorer
                                 </Button>
                                 <Button variant="outline">
-                                    <Network className="mr-2 size-4" />
+                                    <Network className="mr-2 size-4"/>
                                     Network Monitor
                                 </Button>
                                 <Button variant="outline">
-                                    <Cpu className="mr-2 size-4" />
+                                    <Cpu className="mr-2 size-4"/>
                                     Performance Profiler
                                 </Button>
                                 <Button variant="outline">
-                                    <MemoryStick className="mr-2 size-4" />
+                                    <MemoryStick className="mr-2 size-4"/>
                                     Memory Analyzer
                                 </Button>
                             </div>
@@ -2309,24 +2309,24 @@ export default function OwnProfile({ open, setOpen }: OwnProfileProps) {
 
                         <div className="border border-destructive rounded-lg p-4">
                             <h3 className="font-medium flex items-center gap-2 text-destructive mb-4">
-                                <AlertTriangle className="size-5" />
+                                <AlertTriangle className="size-5"/>
                                 Danger Zone
                             </h3>
                             <div className="space-y-4">
                                 <Button variant="destructive" className="w-full">
-                                    <Trash className="mr-2 size-4" />
+                                    <Trash className="mr-2 size-4"/>
                                     Delete All Chat History
                                 </Button>
                                 <Button variant="destructive" className="w-full">
-                                    <FileX className="mr-2 size-4" />
+                                    <FileX className="mr-2 size-4"/>
                                     Clear All Data
                                 </Button>
                                 <Button variant="destructive" className="w-full">
-                                    <LogOut className="mr-2 size-4" />
+                                    <LogOut className="mr-2 size-4"/>
                                     Log Out of All Devices
                                 </Button>
                                 <Button variant="destructive" className="w-full">
-                                    <Trash className="mr-2 size-4" />
+                                    <Trash className="mr-2 size-4"/>
                                     Delete Account Permanently
                                 </Button>
                             </div>
