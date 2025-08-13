@@ -7,8 +7,8 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import {
     Command,
     CommandInput,
-    CommandEmpty,
     CommandGroup,
+    CommandList,
     CommandItem,
 } from "@/components/ui/command";
 import { ChevronsUpDown } from "lucide-react";
@@ -26,20 +26,26 @@ function UserCombobox({ selected, onSelect }: UserComboboxProps) {
     const [fetching, setFetching] = useState<boolean>(false);
 
     useEffect(() => {
-        setFetching(true);
-        filterUsers();
-    }, [query]);
+        const fetchUsers = async () => {
+            if (query.length < 3) {
+                setUsers([]);
+                return;
+            }
 
-    const filterUsers = async () => {
-        try {
-            const response = await getUserForNewChat(query);
-            setUsers(response.data);
-        } catch (e) {
-            console.log(e);
-        } finally {
-            setFetching(false);
-        }
-    }
+            setFetching(true);
+            try {
+                const response = await getUserForNewChat(query);
+                setUsers(response.data);
+            } catch (e) {
+                console.log(e);
+                setUsers([]);
+            } finally {
+                setFetching(false);
+            }
+        };
+
+        fetchUsers();
+    }, [query]);
 
     return (
         <Popover>
@@ -54,32 +60,42 @@ function UserCombobox({ selected, onSelect }: UserComboboxProps) {
                     <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
                 </Button>
             </PopoverTrigger>
-
             <PopoverContent className="p-0 w-full">
-                <Command>
+                <Command shouldFilter={false}>
                     <CommandInput
                         placeholder="Type a name or @username…"
                         value={query}
                         onValueChange={setQuery}
                         autoFocus
                     />
-                    <CommandEmpty>No user found.</CommandEmpty>
-                    <CommandGroup>
-                        {users.map((u) => (
-                            <CommandItem
-                                key={u.id}
-                                onSelect={() => {
-                                    onSelect(u);
-                                    // setQuery("");
-                                }}
-                            >
-                                <span className="font-medium">{u.firstname}</span>
-                                <span className="ml-auto text-xs text-muted-foreground">
-                                    @{u.username}
-                                </span>
-                            </CommandItem>
-                        ))}
-                    </CommandGroup>
+                    <CommandList>
+                        {query.length > 0 && query.length < 3 && !fetching && (
+                            <div className="py-2 px-3 text-sm text-muted-foreground">Type at least 3 characters…</div>
+                        )}
+                        {fetching && (
+                            <div className="py-2 px-3 text-sm text-muted-foreground">Fetching users…</div>
+                        )}
+                        {!fetching && query.length >= 3 && users.length === 0 && (
+                            <div className="py-2 px-3 text-sm text-muted-foreground">No user found.</div>
+                        )}
+                        <CommandGroup>
+                            {users.map((u) => (
+                                <CommandItem
+                                    key={u.id}
+                                    value={`${u.firstname} ${u.lastname || ""} @${u.username}`}
+                                    onSelect={() => {
+                                        onSelect(u);
+                                        setQuery("");
+                                    }}
+                                >
+                                    <span className="font-medium">{u.firstname}</span>
+                                    <span className="ml-auto text-xs text-muted-foreground">
+                                        @{u.username}
+                                    </span>
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
                 </Command>
             </PopoverContent>
         </Popover>
