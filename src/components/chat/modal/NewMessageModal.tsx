@@ -14,6 +14,10 @@ import {
 import { ChevronsUpDown } from "lucide-react";
 import { UserForNewChatType } from "@/type/user/UserType";
 import { getUserForNewChat } from "@/api/chat/user.api";
+import useMyNotice from "@/hooks/useMyNotice";
+import NoticeEnum from "@/enums/NoticeEnum";
+import $api from '@/api/request';
+import { newStartChat } from "@/api/chat/chat.api";
 
 interface UserComboboxProps {
     selected: UserForNewChatType | null;
@@ -109,13 +113,25 @@ type NewMessageModalProps = {
 
 export default function NewMessageModal({ open, setOpen }: NewMessageModalProps) {
     const [selectedUser, setSelectedUser] = useState<UserForNewChatType | null>(null);
+    const [saving, setSaving] = useState<boolean>(false);
+    const { showMessage } = useMyNotice();
+    const [notiId, setNotiId] = useState(null);
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!selectedUser) return;
         const message = (e.currentTarget.message as HTMLTextAreaElement).value;
-        console.log("Send to:", selectedUser, "Message:", message);
-        // TODO: send via WebSocket / REST API
+
+        setSaving(true);
+        try {
+            const response = await newStartChat(selectedUser.id, message);
+            showMessage(response.message, NoticeEnum.SUCCESS);
+        } catch (e) {
+            showMessage("Something went wrong!", NoticeEnum.ERROR);
+        } finally {
+            setSaving(false);
+        }
+
         setOpen(false);
     };
 

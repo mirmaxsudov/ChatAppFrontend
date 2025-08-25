@@ -1,7 +1,10 @@
-import type { Metadata } from "next";
+"use client";
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { useStomp } from "@/hooks/ws/useStomp";
+import useUser from "@/store/useUser";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,13 +16,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = { title: "Chat App", description: "" };
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const accessToken = useUser(state => state.user?.accessToken);
+  useStomp(() => accessToken!);
   return (
     <html lang="en">
       <body
