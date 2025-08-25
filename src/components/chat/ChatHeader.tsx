@@ -1,7 +1,12 @@
 import { Backpack, CircleArrowLeft, EllipsisVertical, PenOff, Trash, User } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { ChatSummary } from "@/type/chat/chat";
 
-const ChatHeader = () => {
+const ChatHeader = ({
+    chat
+}: {
+    chat: ChatSummary
+}) => {
     return (
         <>
             <div className={`sticky top-0 left-0 w-full dark:bg-[#23262F] z-10 py-[10px] px-[8px] flex justify-between items-center`}>
@@ -11,11 +16,11 @@ const ChatHeader = () => {
                     </div>
                     <div className="flex flex-col">
                         <h1>
-                            Abdurahmon Mirmaxsudov
+                            {chat.chatTitle}
                         </h1>
-                        <p className="text-sm text-[#747881]">
+                        {/* <p className="text-sm text-[#747881]">
                             Online for 10 mins
-                        </p>
+                        </p> */}
                     </div>
                 </div>
                 <div>

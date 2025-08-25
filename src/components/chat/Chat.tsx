@@ -6,6 +6,8 @@ const Chat = () => {
     return <>
         <div className="relative">
             <ChatHeader/>
+            <ChatContent/>
+            <ChatFooter/>
         </div>
     </>
 }

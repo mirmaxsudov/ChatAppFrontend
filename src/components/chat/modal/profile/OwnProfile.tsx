@@ -1,4 +1,3 @@
-// components/OwnProfile.tsx
 "use client";
 
 import {useState, useEffect} from "react";
@@ -97,7 +96,12 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Collapsible, CollapsibleTrigger, CollapsibleContent} from "@/components/ui/collapsible";
 import {formatBytes} from "@/lib/utils";
 
-export default function OwnProfile() {
+type OwnProfileProps = {
+    open: boolean;
+    setOpen: (open: boolean) => void;
+}
+
+export default function OwnProfile({open, setOpen}: OwnProfileProps) {
     type TabKey =
         | "profile"
         | "account"
@@ -350,9 +354,11 @@ export default function OwnProfile() {
         });
     };
 
+    console.log("Open", open);
+
     return (
-        <Dialog open>
-            <DialogContent className="w-[800px] max-h-[90vh] overflow-y-auto">
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent className="w-[1200px] max-h-[90vh] overflow-y-auto scrollbar-hide">
                 <DialogHeader>
                     <DialogTitle>Account Settings</DialogTitle>
                     <DialogDescription>
@@ -362,8 +368,8 @@ export default function OwnProfile() {
 
                 <Tabs
                     value={tab}
-                    onValueChange={setTab}
-                    className="mt-4 overflow-x-auto"
+                    onValueChange={value => setTab(value as TabKey)}
+                    className="mt-4 w-full overflow-x-auto"
                 >
                     <TabsList className="grid grid-cols-9 min-w-max">
                         <TabsTrigger value="profile">
@@ -498,7 +504,7 @@ export default function OwnProfile() {
                             <div>
                                 <Label>Profile Badges</Label>
                                 <div className="flex gap-2 mt-2">
-                                    <Badge variant="premium" className="flex items-center gap-1">
+                                    <Badge variant="default" className="flex items-center gap-1">
                                         <BadgeCheck className="size-4"/> Premium
                                     </Badge>
                                     <Badge variant="secondary" className="flex items-center gap-1">
@@ -522,7 +528,7 @@ export default function OwnProfile() {
                                 <History className="mr-2 size-4"/>
                                 View Edit History
                             </Button>
-                            <Button variant="primary">Save Profile</Button>
+                            <Button variant="default">Save Profile</Button>
                         </div>
                     </TabsContent>
 
@@ -678,7 +684,7 @@ export default function OwnProfile() {
                                         <div>
                                             <p className="font-medium">Show online status</p>
                                             <p className="text-xs text-muted-foreground">
-                                                Let others see when you’re online
+                                                Let others see when you're online
                                             </p>
                                         </div>
                                         <Switch defaultChecked/>
@@ -1275,7 +1281,7 @@ export default function OwnProfile() {
                                     <div>
                                         <p className="font-medium">Typing indicators</p>
                                         <p className="text-xs text-muted-foreground">
-                                            Show “user is typing” status
+                                            Show "user is typing" status
                                         </p>
                                     </div>
                                     <Switch defaultChecked/>

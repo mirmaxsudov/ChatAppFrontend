@@ -24,10 +24,22 @@ import {useTheme} from "next-themes";
 import {capitalizeFirstLetter} from "@/helper/ts/Capitalize";
 import useUser from "@/store/useUser";
 import NewMessageModal from "@/components/chat/modal/NewMessageModal";
+import {useState} from "react";
+import OwnProfile from "@/components/chat/modal/profile/OwnProfile";
 
 const ChatNavDropDown = () => {
     const {theme, setTheme} = useTheme();
     const user = useUser((state) => state.user);
+    const [opens, setOpens] = useState({
+        newMessageModal: false,
+        profileModal: false
+    });
+
+    const setNewMessageModal = (val: boolean) =>
+        setOpens((prev) => ({...prev, newMessageModal: val}));
+
+    const setProfileModal = (val: boolean) =>
+        setOpens((prev) => ({...prev, profileModal: val}));
 
     return (
         <>
@@ -58,7 +70,9 @@ const ChatNavDropDown = () => {
                         <SaveAll width={16} className={"text-[#8292A8] mr-[5px]"}/> Messages
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent className="dark:bg-[#0F172B]">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem className={"cursor-pointer"} onClick={() => setOpens({
+                            ...opens, newMessageModal: true
+                        })}>
                             <Pen/> New Direct Message
                         </DropdownMenuItem>
                         <DropdownMenuItem>
@@ -80,14 +94,15 @@ const ChatNavDropDown = () => {
                     {capitalizeFirstLetter(theme as string)} Mode
                 </DropdownMenuItem>
                 <DropdownMenuSeparator/>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setProfileModal(true)}>
                     <Settings/> Settings
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                     <User/> Sign out
                 </DropdownMenuItem>
             </DropdownMenuContent>
-            <NewMessageModal/>
+            <OwnProfile open={opens.profileModal} setOpen={setProfileModal}/>
+            <NewMessageModal open={opens.newMessageModal} setOpen={setNewMessageModal}/>
         </>
     );
 };

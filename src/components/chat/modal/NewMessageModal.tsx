@@ -1,40 +1,55 @@
 "use client";
 
-import {useState, useEffect} from "react";
-import {Dialog, DialogContent, DialogHeader} from "@/components/ui/dialog";
-import {Button} from "@/components/ui/button";
-import {Popover, PopoverTrigger, PopoverContent} from "@/components/ui/popover";
+import { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import {
     Command,
     CommandInput,
-    CommandEmpty,
     CommandGroup,
+    CommandList,
     CommandItem,
 } from "@/components/ui/command";
-import {ChevronsUpDown} from "lucide-react";
-
-interface User {
-    id: string;
-    name: string;
-    username: string;
-    avatarUrl: string
-}
+import { ChevronsUpDown } from "lucide-react";
+import { UserForNewChatType } from "@/type/user/UserType";
+import { getUserForNewChat } from "@/api/chat/user.api";
+import useMyNotice from "@/hooks/useMyNotice";
+import NoticeEnum from "@/enums/NoticeEnum";
+import $api from '@/api/request';
+import { newStartChat } from "@/api/chat/chat.api";
 
 interface UserComboboxProps {
-    users: User[];
-    selected: User | null;
-    onSelect: (u: User) => void;
+    selected: UserForNewChatType | null;
+    onSelect: (u: UserForNewChatType) => void;
 }
 
-function UserCombobox({users, selected, onSelect}: UserComboboxProps) {
+function UserCombobox({ selected, onSelect }: UserComboboxProps) {
     const [query, setQuery] = useState("");
-    const filtered = query
-        ? users.filter(
-            (u) =>
-                u.name.toLowerCase().includes(query.toLowerCase()) ||
-                u.username.toLowerCase().includes(query.toLowerCase())
-        )
-        : users;
+    const [users, setUsers] = useState<UserForNewChatType[]>([]);
+    const [fetching, setFetching] = useState<boolean>(false);
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            if (query.length < 3) {
+                setUsers([]);
+                return;
+            }
+
+            setFetching(true);
+            try {
+                const response = await getUserForNewChat(query);
+                setUsers(response.data);
+            } catch (e) {
+                console.log(e);
+                setUsers([]);
+            } finally {
+                setFetching(false);
+            }
+        };
+
+        fetchUsers();
+    }, [query]);
 
     return (
         <Popover>
@@ -45,144 +60,78 @@ function UserCombobox({users, selected, onSelect}: UserComboboxProps) {
                     aria-expanded="false"
                     className="w-full justify-between"
                 >
-                    {selected ? selected.name : "Select user..."}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50"/>
+                    {selected ? selected.firstname + (selected.lastname || "") : "Select user..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
                 </Button>
             </PopoverTrigger>
-
             <PopoverContent className="p-0 w-full">
-                <Command>
+                <Command shouldFilter={false}>
                     <CommandInput
                         placeholder="Type a name or @username…"
                         value={query}
                         onValueChange={setQuery}
                         autoFocus
                     />
-                    <CommandEmpty>No user found.</CommandEmpty>
-                    <CommandGroup>
-                        {filtered.map((u) => (
-                            <CommandItem
-                                key={u.id}
-                                onSelect={() => {
-                                    onSelect(u);
-                                    setQuery("");
-                                }}
-                            >
-                                <span className="font-medium">{u.name}</span>
-                                <span className="ml-auto text-xs text-muted-foreground">
-                  @{u.username}
-                </span>
-                            </CommandItem>
-                        ))}
-                    </CommandGroup>
+                    <CommandList>
+                        {query.length > 0 && query.length < 3 && !fetching && (
+                            <div className="py-2 px-3 text-sm text-muted-foreground">Type at least 3 characters…</div>
+                        )}
+                        {fetching && (
+                            <div className="py-2 px-3 text-sm text-muted-foreground">Fetching users…</div>
+                        )}
+                        {!fetching && query.length >= 3 && users.length === 0 && (
+                            <div className="py-2 px-3 text-sm text-muted-foreground">No user found.</div>
+                        )}
+                        <CommandGroup>
+                            {users.map((u) => (
+                                <CommandItem
+                                    key={u.id}
+                                    value={`${u.firstname} ${u.lastname || ""} @${u.username}`}
+                                    onSelect={() => {
+                                        onSelect(u);
+                                        setQuery("");
+                                    }}
+                                >
+                                    <span className="font-medium">{u.firstname}</span>
+                                    <span className="ml-auto text-xs text-muted-foreground">
+                                        @{u.username}
+                                    </span>
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
                 </Command>
             </PopoverContent>
         </Popover>
     );
 }
 
-export default function NewMessageModal() {
-    const [open, setOpen] = useState(true);
-    const [users, setUsers] = useState<User[]>([]);
-    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+type NewMessageModalProps = {
+    open: boolean;
+    setOpen: (open: boolean) => void;
+}
 
-    useEffect(() => {
-        setUsers([
-            {
-                id: "1",
-                name: "Alice Johnson",
-                username: "alicej",
-                avatarUrl: "https://i.pravatar.cc/150?img=1",
-            },
-            {
-                id: "2",
-                name: "Bob Martinez",
-                username: "bobm",
-                avatarUrl: "https://i.pravatar.cc/150?img=2",
-            },
-            {
-                id: "3",
-                name: "Cara Nguyen",
-                username: "carang",
-                avatarUrl: "https://i.pravatar.cc/150?img=3",
-            },
-            {
-                id: "4",
-                name: "David Kim",
-                username: "davidk",
-                avatarUrl: "https://i.pravatar.cc/150?img=4",
-            },
-            {
-                id: "5",
-                name: "Ella Fitzgerald",
-                username: "ella.f",
-                avatarUrl: "https://i.pravatar.cc/150?img=5",
-            },
-            {
-                id: "6",
-                name: "Frank Liu",
-                username: "frankl",
-                avatarUrl: "https://i.pravatar.cc/150?img=6",
-            },
-            {
-                id: "7",
-                name: "Grace Patel",
-                username: "gracep",
-                avatarUrl: "https://i.pravatar.cc/150?img=7",
-            },
-            {
-                id: "8",
-                name: "Hector Ruiz",
-                username: "hectorr",
-                avatarUrl: "https://i.pravatar.cc/150?img=8",
-            },
-            {
-                id: "9",
-                name: "Ivy Chen",
-                username: "ivy.c",
-                avatarUrl: "https://i.pravatar.cc/150?img=9",
-            },
-            {
-                id: "10",
-                name: "Jack Thompson",
-                username: "jackt",
-                avatarUrl: "https://i.pravatar.cc/150?img=10",
-            },
-            {
-                id: "11",
-                name: "Kate Kim",
-                username: "katek",
-                avatarUrl: "https://i.pravatar.cc/150?img=11",
-            },
-            {
-                id: "12",
-                name: "Leo Zhang",
-                username: "leoz",
-                avatarUrl: "https://i.pravatar.cc/150?img=12",
-            },
-            {
-                id: "13",
-                name: "Mia Nguyen",
-                username: "mian",
-                avatarUrl: "https://i.pravatar.cc/150?img=13",
-            }
-        ]);
-    }, []);
+export default function NewMessageModal({ open, setOpen }: NewMessageModalProps) {
+    const [selectedUser, setSelectedUser] = useState<UserForNewChatType | null>(null);
+    const [saving, setSaving] = useState<boolean>(false);
+    const { showMessage } = useMyNotice();
+    const [notiId, setNotiId] = useState(null);
 
-    // useEffect(() => {
-    //     // Replace this with your real API call:
-    //     fetch("/api/users")
-    //         .then((res) => res.json())
-    //         .then((data: User[]) => setUsers(data))
-    //         .catch(console.error);
-    // }, []);
-
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!selectedUser) return;
         const message = (e.currentTarget.message as HTMLTextAreaElement).value;
-        console.log("Send to:", selectedUser, "Message:", message);
-        // TODO: send via WebSocket / REST API
+
+        setSaving(true);
+        try {
+            const response = await newStartChat(selectedUser.id, message);
+            showMessage(response.message, NoticeEnum.SUCCESS);
+        } catch (e) {
+            showMessage("Something went wrong!", NoticeEnum.ERROR);
+        } finally {
+            setSaving(false);
+        }
+
         setOpen(false);
     };
 
@@ -190,17 +139,16 @@ export default function NewMessageModal() {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="sm:max-w-lg">
                 <DialogHeader>
-                    <h2 className="text-lg font-semibold">New Message</h2>
-                    <p className="text-sm text-muted-foreground">
+                    <DialogTitle>New Message</DialogTitle>
+                    <DialogDescription>
                         Search a user and start chatting.
-                    </p>
+                    </DialogDescription>
                 </DialogHeader>
 
                 <form className="space-y-6" onSubmit={handleSubmit}>
                     <div>
                         <label className="block text-sm font-medium">Recipient</label>
                         <UserCombobox
-                            users={users}
                             selected={selectedUser}
                             onSelect={setSelectedUser}
                         />
