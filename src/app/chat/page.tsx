@@ -69,7 +69,7 @@ const Chat = () => {
                             <div className="flex-1 overflow-y-auto p-[8px]">
                                 <ChatContent chat={selectedChat} />
                             </div>
-                            <ChatFooter />
+                            <ChatFooter chat={selectedChat} />
                         </div>
                     </div>
                 </>}

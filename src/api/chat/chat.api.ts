@@ -12,4 +12,14 @@ const newStartChat = async (targetUserId: number, message: string): Promise<ApiR
     return response.data;
 }
 
-export { newStartChat };
+const sendMessage = async (chatId: number, message: string): Promise<ApiResponse<string>> => {
+    const response = await $api.post<ApiResponse<string>>(BASE_URL + "/send-message", null, {
+        params: {
+            chatId,
+            message
+        }
+    });
+    return response.data;
+}
+
+export { newStartChat, sendMessage };

@@ -36,7 +36,7 @@ const ChatList = ({
 
     useEffect(() => {
         if (data) setChats(data);
-    }, [data]); 
+    }, [data]);
 
     return (
         <div style={{ width }} className="w-full relative h-full flex flex-col">
