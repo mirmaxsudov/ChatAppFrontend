@@ -58,8 +58,9 @@ const JustTextMessageRight = ({ message }) => {
 
                 <div className="flex flex-col items-end my-[5px]">
                     <div className="bg-[#E0F0FF] rounded-[10px] break-all dark:text-[#fff] text-[#080707] py-[8px] px-[16px] dark:bg-[#001A3D] text-justify w-fit max-w-[426px]">
-                        <p className="text-[14px]">
-                            {message}
+                        <p className="text-[14px]" dangerouslySetInnerHTML={{
+                          __html: message
+                        }}>
                         </p>
                         <div className="flex mt-[4px] items-center justify-end gap-[5px]">
                             {BOTH_SIDE_READ}

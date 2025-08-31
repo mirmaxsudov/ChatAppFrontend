@@ -15,6 +15,7 @@ import { RefreshCw, AlertCircle } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { MessageResponse } from "@/type/chat/message";
 import { useUserChatMsgTopic } from "@/hooks/ws/useUserChatMsgTopic";
+import { linkify } from "@/helper/ts/Linkify";
 
 // Message Skeleton Component
 const MessageSkeleton = ({ isRight = false }: { isRight?: boolean }) => (
@@ -48,7 +49,6 @@ const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
     </div>
 );
 
-// Loading Skeleton Component
 const LoadingSkeleton = () => (
     <div className="space-y-4 p-4">
         {Array.from({ length: 6 }).map((_, index) => (
@@ -57,23 +57,22 @@ const LoadingSkeleton = () => (
     </div>
 );
 
-// Animated Message Component
-const AnimatedMessage = ({ 
-    message, 
-    isOwn, 
-    isNew = false 
-}: { 
-    message: MessageResponse; 
-    isOwn: boolean; 
+const AnimatedMessage = ({
+    message,
+    isOwn,
+    isNew = false
+}: {
+    message: MessageResponse;
+    isOwn: boolean;
     isNew?: boolean;
 }) => {
     const messageRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (isNew && messageRef.current) {
-            messageRef.current.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'nearest' 
+            messageRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
             });
         }
     }, [isNew]);
@@ -83,17 +82,16 @@ const AnimatedMessage = ({
     return (
         <div
             ref={messageRef}
-            className={`transition-all duration-500 ease-out ${
-                isNew 
-                    ? 'animate-in slide-in-from-bottom-2 fade-in-0' 
-                    : ''
-            }`}
+            className={`transition-all duration-500 ease-out ${isNew
+                ? 'animate-in slide-in-from-bottom-2 fade-in-0'
+                : ''
+                }`}
             style={{
                 animationDelay: isNew ? '0ms' : undefined,
                 animationFillMode: 'both'
             }}
         >
-            <MessageComponent message={message.text} />
+            <MessageComponent message={linkify(message.text)} />
         </div>
     );
 };
@@ -119,7 +117,7 @@ const ChatContent = ({
         setMessages(prevMessages => [...prevMessages, msg]);
         // Mark this message as new for animation
         setNewMessageIds(prev => new Set([...prev, msg.id]));
-        
+
         // Remove the new indicator after animation completes
         setTimeout(() => {
             setNewMessageIds(prev => {
