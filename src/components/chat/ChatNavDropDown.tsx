@@ -20,26 +20,43 @@ import {
     DropdownMenuSubContent,
 } from "../ui/dropdown-menu";
 import Link from "next/link";
-import {useTheme} from "next-themes";
-import {capitalizeFirstLetter} from "@/helper/ts/Capitalize";
+import { useTheme } from "next-themes";
+import { capitalizeFirstLetter } from "@/helper/ts/Capitalize";
 import useUser from "@/store/useUser";
 import NewMessageModal from "@/components/chat/modal/NewMessageModal";
-import {useState} from "react";
+import { useState } from "react";
 import OwnProfile from "@/components/chat/modal/profile/OwnProfile";
+import { useRouter } from "next/navigation";
+import NewChannelModal from "./modal/NewChannelModal";
 
-const ChatNavDropDown = () => {
-    const {theme, setTheme} = useTheme();
+const ChatNavDropDown = ({
+    setSavedChat
+}: {
+    setSavedChat: () => void
+}) => {
+    const { theme, setTheme } = useTheme();
     const user = useUser((state) => state.user);
     const [opens, setOpens] = useState({
         newMessageModal: false,
-        profileModal: false
+        profileModal: false,
+        newChannelModal: false
     });
+    const clearUser = useUser(state => state.clearUser);
+
+    const router = useRouter();
 
     const setNewMessageModal = (val: boolean) =>
-        setOpens((prev) => ({...prev, newMessageModal: val}));
+        setOpens((prev) => ({ ...prev, newMessageModal: val }));
 
     const setProfileModal = (val: boolean) =>
-        setOpens((prev) => ({...prev, profileModal: val}));
+        setOpens((prev) => ({ ...prev, profileModal: val }));
+
+    const setNewChannelModal = (val: boolean) =>
+        setOpens(prev => ({ ...prev, newChannelModal: val }));
+
+    const handleSavedMessages = () => {
+        setSavedChat();
+    }
 
     return (
         <>
@@ -57,52 +74,58 @@ const ChatNavDropDown = () => {
                             alt="Profile"
                         />
                         <span>
-            {user?.firstName} {user?.lastname}
-          </span>
+                            {user?.firstName} {user?.lastname}
+                        </span>
                     </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator/>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                    <AtSign/> Mentions
+                    <AtSign /> Mentions
                 </DropdownMenuItem>
                 <DropdownMenuSub>
                     <DropdownMenuSubTrigger>
-                        <SaveAll width={16} className={"text-[#8292A8] mr-[5px]"}/> Messages
+                        <SaveAll width={16} className={"text-[#8292A8] mr-[5px]"} /> Messages
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent className="dark:bg-[#0F172B]">
                         <DropdownMenuItem className={"cursor-pointer"} onClick={() => setOpens({
                             ...opens, newMessageModal: true
                         })}>
-                            <Pen/> New Direct Message
+                            <Pen /> New Direct Message
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                            <Users/> New Group
+                            <Users /> New Group
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <UsersRound/> New Channel
+                        <DropdownMenuItem onClick={() => {
+                            setNewChannelModal(true);
+                        }}>
+                            <UsersRound /> New Channel
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <SaveAll/> Saved messages
+                        <DropdownMenuItem onClick={() => handleSavedMessages()}>
+                            <SaveAll /> Saved messages
                         </DropdownMenuItem>
                     </DropdownMenuSubContent>
                 </DropdownMenuSub>
-                <DropdownMenuSeparator/>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem
                     onClick={() => setTheme(theme === "light" ? "dark" : "light")}
                 >
-                    {theme === "light" ? <Moon/> : <Sun/>}
+                    {theme === "light" ? <Moon /> : <Sun />}
                     {capitalizeFirstLetter(theme as string)} Mode
                 </DropdownMenuItem>
-                <DropdownMenuSeparator/>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setProfileModal(true)}>
-                    <Settings/> Settings
+                    <Settings /> Settings
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <User/> Sign out
+                <DropdownMenuItem onClick={() => {
+                    clearUser();
+                    router.push("/");
+                }}>
+                    <User /> Sign out
                 </DropdownMenuItem>
             </DropdownMenuContent>
-            <OwnProfile open={opens.profileModal} setOpen={setProfileModal}/>
-            <NewMessageModal open={opens.newMessageModal} setOpen={setNewMessageModal}/>
+            <OwnProfile open={opens.profileModal} setOpen={setProfileModal} />
+            <NewMessageModal open={opens.newMessageModal} setOpen={setNewMessageModal} />
+            <NewChannelModal open={opens.newChannelModal} setOpen={setNewChannelModal} />
         </>
     );
 };

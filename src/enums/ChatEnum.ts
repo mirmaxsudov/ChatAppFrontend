@@ -1,5 +1,5 @@
 export enum ChatType {
-    DM = "DM", GROUP = "GROUP", CHANNEL = 'CHANNEL', SAVED = "SAVED";
+    DM = "DM", GROUP = "GROUP", CHANNEL = 'CHANNEL', SAVED = "SAVED"
 }
 
 export enum MessageTypeEnum {

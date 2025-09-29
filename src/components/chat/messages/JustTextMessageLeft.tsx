@@ -8,8 +8,9 @@ const JustTextMessageLeft = ({ message }) => {
             </div>
             <div className="bg-[#E9EAED] rounded-[10px] break-all dark:text-[#fff] text-[#080707] py-[8px] px-[16px] dark:bg-[#23262F] text-justify w-fit max-w-[426px]">
                 <div>
-                    <p className="text-[14px]">
-                        {message}
+                    <p className="text-[14px]" dangerouslySetInnerHTML={{
+                        __html: message
+                    }}>
                     </p>
                     <p className="text-[#747881] mt-[4px] text-start text-[10px]">
                         2:16 PM
