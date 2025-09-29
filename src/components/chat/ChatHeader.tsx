@@ -1,6 +1,10 @@
-import { Backpack, CircleArrowLeft, EllipsisVertical, PenOff, Trash, User } from "lucide-react";
+import { CircleArrowLeft, EllipsisVertical, PenOff, Trash, User } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { ChatSummary } from "@/type/chat/chat";
+
+import SavedMessageImage from "../../../public/images/savedMessage.png";
+import { ChatType } from "@/enums/ChatEnum";
+import Image from "next/image";
 
 const ChatHeader = ({
     chat
@@ -12,15 +16,15 @@ const ChatHeader = ({
             <div className={`sticky top-0 left-0 w-full dark:bg-[#23262F] z-10 py-[10px] px-[8px] flex justify-between items-center`}>
                 <div className="flex items-center gap-[18px]">
                     <div className="size-[40px]">
-                        <img className="size-full rounded-full" src="https://letsenhance.io/static/73136da51c245e80edc6ccfe44888a99/1015f/MainBefore.jpg" alt="something" />
+                        <Image className="size-full rounded-full" width={40} height={40} src={chat.type === ChatType.SAVED ? SavedMessageImage.src : ""} alt="something" />
                     </div>
                     <div className="flex flex-col">
                         <h1>
                             {chat.chatTitle}
                         </h1>
-                        {/* <p className="text-sm text-[#747881]">
+                        {chat.type === ChatType.DM ? <p className="text-sm text-[#747881]">
                             Online for 10 mins
-                        </p> */}
+                        </p> : ""}
                     </div>
                 </div>
                 <div>

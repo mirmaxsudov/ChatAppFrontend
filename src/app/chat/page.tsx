@@ -49,7 +49,7 @@ const Chat = () => {
                     className="h-full flex-shrink-0 bg-gray-100 dark:bg-[#23262F] border-r border-gray-200 dark:border-[#23262F] transition-colors duration-300"
                     style={{ width: sidebarWidth }}
                 >
-                    <ChatList width={sidebarWidth} setSelectedChat={setSelectedChat} />
+                    <ChatList selectedChat={selectedChat} width={sidebarWidth} setSelectedChat={setSelectedChat} />
                 </div>
                 <div
                     className="w-2 cursor-col-resize bg-gray-200 dark:bg-[#23262F] hover:bg-gray-300 dark:hover:bg-[#2A2D36] transition-colors duration-300"

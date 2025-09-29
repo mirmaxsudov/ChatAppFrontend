@@ -115,10 +115,7 @@ const ChatContent = ({
 
     useUserChatMsgTopic(chat.chatId, (msg: MessageResponse) => {
         setMessages(prevMessages => [...prevMessages, msg]);
-        // Mark this message as new for animation
         setNewMessageIds(prev => new Set([...prev, msg.id]));
-
-        // Remove the new indicator after animation completes
         setTimeout(() => {
             setNewMessageIds(prev => {
                 const newSet = new Set(prev);

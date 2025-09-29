@@ -29,7 +29,11 @@ import OwnProfile from "@/components/chat/modal/profile/OwnProfile";
 import { useRouter } from "next/navigation";
 import NewChannelModal from "./modal/NewChannelModal";
 
-const ChatNavDropDown = () => {
+const ChatNavDropDown = ({
+    setSavedChat
+}: {
+    setSavedChat: () => void
+}) => {
     const { theme, setTheme } = useTheme();
     const user = useUser((state) => state.user);
     const [opens, setOpens] = useState({
@@ -49,6 +53,10 @@ const ChatNavDropDown = () => {
 
     const setNewChannelModal = (val: boolean) =>
         setOpens(prev => ({ ...prev, newChannelModal: val }));
+
+    const handleSavedMessages = () => {
+        setSavedChat();
+    }
 
     return (
         <>
@@ -92,7 +100,7 @@ const ChatNavDropDown = () => {
                         }}>
                             <UsersRound /> New Channel
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleSavedMessages()}>
                             <SaveAll /> Saved messages
                         </DropdownMenuItem>
                     </DropdownMenuSubContent>
