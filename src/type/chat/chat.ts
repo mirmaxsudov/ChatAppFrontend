@@ -6,5 +6,6 @@ export type ChatSummary = {
     type: ChatType;
     secondUserId: number | null;
     lastMessageId: number;
+    lastReadMessageSeq: number;
     chatTitle: string;
 };

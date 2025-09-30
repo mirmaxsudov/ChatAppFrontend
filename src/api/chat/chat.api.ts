@@ -22,4 +22,13 @@ const sendMessage = async (chatId: number, message: string): Promise<ApiResponse
     return response.data;
 }
 
-export { newStartChat, sendMessage };
+const readMessages = async (chatId: number, lastReadMessageSeq: number): Promise<ApiResponse<string>> => {
+    const response = await $api.post<ApiResponse<string>>(BASE_URL + `/read/${chatId}`, undefined, {
+        params: {
+            lastReadMessageSeq
+        }
+    });
+    return response.data;
+}
+
+export { newStartChat, sendMessage, readMessages };

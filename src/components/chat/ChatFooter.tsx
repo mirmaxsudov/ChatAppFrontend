@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import StickerPicker from "./StickerPicker";
 import ChatStickerDropdown from "./ChatStickerDropdown";
 import UploadDropdown from "./UploadDropdown";
@@ -22,6 +22,7 @@ const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
     const [uploads, setUploads] = useState<UploadedItem[]>([]);
     const [isSending, setIsSending] = useState<boolean>(false);
     const { showMessage, dismiss } = useMyNotice();
+    const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (sticker) {
@@ -57,6 +58,7 @@ const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
 
         setIsSending(true);
         const toastRef = { id: undefined };
+        let messageSent = false;
 
         try {
             showMessage("Sending message...", NoticeEnum.LOADING, undefined, toastRef);
@@ -68,6 +70,7 @@ const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
                 showMessage("Message sent successfully!", NoticeEnum.SUCCESS);
                 setText("");
                 setUploads([]);
+                messageSent = true;
             } else {
                 dismiss(toastRef);
                 showMessage(response.message || "Failed to send message", NoticeEnum.ERROR);
@@ -78,6 +81,9 @@ const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
             showMessage("Failed to send message. Please try again.", NoticeEnum.ERROR);
         } finally {
             setIsSending(false);
+            if (messageSent) {
+                setTimeout(() => inputRef.current?.focus(), 0);
+            }
         }
     };
 
@@ -134,6 +140,7 @@ const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
                 <div
                     className="border-[#747881] border-[1px] rounded-full px-[16px] py-[10px] w-full flex items-center">
                     <input
+                        ref={inputRef}
                         value={text}
                         onChange={(e) => setText(e.target.value)}
                         onKeyPress={handleKeyPress}
@@ -148,8 +155,8 @@ const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
                     onClick={handleSendMessage}
                     disabled={isSending || (!text.trim() && uploads.length === 0)}
                     className={`size-[40px] transition-all duration-300 flex items-center justify-center ${isSending || (!text.trim() && uploads.length === 0)
-                            ? 'opacity-50 cursor-not-allowed'
-                            : 'hover:opacity-60 cursor-pointer'
+                        ? 'opacity-50 cursor-not-allowed'
+                        : 'hover:opacity-60 cursor-pointer'
                         }`}
                 >
                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -164,3 +171,5 @@ const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
 }
 
 export default ChatFooter;
+
+
