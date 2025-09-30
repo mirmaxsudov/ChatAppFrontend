@@ -1,6 +1,6 @@
 "use client";
 
-const JustTextMessageLeft = ({ message }) => {
+const JustTextMessageLeft = ({ message }: { message: string }) => {
     return <>
         <div className="flex flex-row gap-[8px] items-start my-[5px]">
             <div className="size-[36px] self-end">
