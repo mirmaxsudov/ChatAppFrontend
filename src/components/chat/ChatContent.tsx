@@ -1,4 +1,4 @@
-"use client"
+    "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -18,13 +18,23 @@ import { ChatType } from "@/enums/ChatEnum";
 import { readMessages } from "@/api/chat/chat.api";
 
 const READ_THROTTLE_MS = 300;
-const FULL_VISIBILITY_RATIO = 0.95;
+// We'll still use our own geometry tolerance check, so 1 here is okay.
+const FULL_VISIBILITY_RATIO = 1;
 const HEIGHT_TOLERANCE_PX = 2;
 
-const isFullyVisible = (
-    elementRect: DOMRect,
-    containerRect: DOMRect,
-): boolean =>
+/** Find the nearest actual scroll container for a given element */
+const getScrollContainer = (el: HTMLElement | null): HTMLElement | null => {
+    let node: HTMLElement | null = el;
+    while (node && node !== document.body) {
+        const style = window.getComputedStyle(node);
+        const overflowY = style.overflowY;
+        if (overflowY === "auto" || overflowY === "scroll") return node;
+        node = node.parentElement as HTMLElement | null;
+    }
+    return (document.scrollingElement as HTMLElement) ?? null;
+};
+
+const isFullyVisible = (elementRect: DOMRect, containerRect: DOMRect): boolean =>
     elementRect.top >= containerRect.top - HEIGHT_TOLERANCE_PX &&
     elementRect.bottom <= containerRect.bottom + HEIGHT_TOLERANCE_PX;
 
@@ -119,14 +129,17 @@ const ChatContent = ({ chat }: { chat: ChatSummary }) => {
     const [lastReadSeq, setLastReadSeq] = useState<number>(chat.lastReadMessageSeq ?? 0);
 
     const contentRef = useRef<HTMLDivElement | null>(null);
+
     const latestSentSeqRef = useRef<number>(chat.lastReadMessageSeq ?? 0);
     const pendingSeqRef = useRef<number | null>(null);
     const throttleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
     const observerRef = useRef<IntersectionObserver | null>(null);
     const messageNodesRef = useRef<Map<number, HTMLDivElement>>(new Map());
     const nodeMetaRef = useRef<Map<HTMLDivElement, { seq: number; senderId: number | null }>>(new Map());
     const highestVisibleSeqRef = useRef<number>(chat.lastReadMessageSeq ?? 0);
 
+    /** Reset read seqs when chat changes */
     useEffect(() => {
         const initialSeq = chat.lastReadMessageSeq ?? 0;
         setLastReadSeq(initialSeq);
@@ -134,12 +147,14 @@ const ChatContent = ({ chat }: { chat: ChatSummary }) => {
         highestVisibleSeqRef.current = initialSeq;
     }, [chat.chatId, chat.lastReadMessageSeq]);
 
+    /** Clear node maps when chat changes */
     useEffect(() => {
         messageNodesRef.current.forEach((node) => observerRef.current?.unobserve(node));
         messageNodesRef.current.clear();
         nodeMetaRef.current.clear();
     }, [chat.chatId]);
 
+    /** Load messages -> reset "new" markers */
     useEffect(() => {
         if (!isLoading && !isError && data?.data) {
             setMessages(data.data);
@@ -147,18 +162,19 @@ const ChatContent = ({ chat }: { chat: ChatSummary }) => {
         }
     }, [data, isLoading, isError]);
 
+    /** Keep latest sent seq monotonic */
     useEffect(() => {
         latestSentSeqRef.current = Math.max(latestSentSeqRef.current, lastReadSeq);
     }, [lastReadSeq]);
 
+    /** Cleanup timers on unmount */
     useEffect(() => {
         return () => {
-            if (throttleRef.current) {
-                clearTimeout(throttleRef.current);
-            }
+            if (throttleRef.current) clearTimeout(throttleRef.current);
         };
     }, []);
 
+    /** Throttled "read" sender */
     const scheduleReadUpdate = useCallback(
         (seq: number) => {
             if (chat.type === ChatType.SAVED) return;
@@ -186,8 +202,9 @@ const ChatContent = ({ chat }: { chat: ChatSummary }) => {
         [chat.chatId, chat.type]
     );
 
+    /** Geometry fallback sweep — checks all nodes for full visibility */
     const evaluateVisibleMessages = useCallback(() => {
-        const container = contentRef.current?.parentElement ?? contentRef.current;
+        const container = getScrollContainer(contentRef.current);
         if (!container) return;
 
         const containerRect = container.getBoundingClientRect();
@@ -196,15 +213,12 @@ const ChatContent = ({ chat }: { chat: ChatSummary }) => {
         messageNodesRef.current.forEach((node, seq) => {
             const meta = nodeMetaRef.current.get(node);
             if (!meta) return;
-
             if (currentUserId !== null && meta.senderId === currentUserId) return;
 
             const rect = node.getBoundingClientRect();
             if (!isFullyVisible(rect, containerRect)) return;
 
-            if (seq > maxSeq) {
-                maxSeq = seq;
-            }
+            if (seq > maxSeq) maxSeq = seq;
         });
 
         if (maxSeq > highestVisibleSeqRef.current) {
@@ -213,21 +227,20 @@ const ChatContent = ({ chat }: { chat: ChatSummary }) => {
         }
     }, [currentUserId, scheduleReadUpdate]);
 
+    /** IO callback — prefers IO, falls back to geometry when near-full */
     const handleVisibilityEntries = useCallback(
         (entries: IntersectionObserverEntry[]) => {
-            let shouldEvalFallback = false;
+            let fallbackNeeded = false;
 
             for (const entry of entries) {
-                if (!entry.isIntersecting) {
-                    continue;
-                }
+                if (!entry.isIntersecting) continue;
 
                 const fullyVisible =
                     entry.intersectionRatio >= FULL_VISIBILITY_RATIO ||
                     entry.intersectionRect.height >= entry.boundingClientRect.height - HEIGHT_TOLERANCE_PX;
 
                 if (!fullyVisible) {
-                    shouldEvalFallback = true;
+                    fallbackNeeded = true;
                     continue;
                 }
 
@@ -235,8 +248,8 @@ const ChatContent = ({ chat }: { chat: ChatSummary }) => {
                 const meta = nodeMetaRef.current.get(element);
                 if (!meta) continue;
 
-                const isOwnMessage = currentUserId !== null && meta.senderId === currentUserId;
-                if (isOwnMessage) continue;
+                const isOwn = currentUserId !== null && meta.senderId === currentUserId;
+                if (isOwn) continue;
 
                 if (meta.seq > highestVisibleSeqRef.current) {
                     highestVisibleSeqRef.current = meta.seq;
@@ -244,103 +257,103 @@ const ChatContent = ({ chat }: { chat: ChatSummary }) => {
                 }
             }
 
-            if (shouldEvalFallback) {
-                evaluateVisibleMessages();
-            }
+            if (fallbackNeeded) evaluateVisibleMessages();
         },
         [currentUserId, evaluateVisibleMessages, scheduleReadUpdate]
     );
 
+    /** Create observer with the real root — re-create on chat change and message count change */
     useEffect(() => {
-        const container = contentRef.current?.parentElement ?? contentRef.current;
+        const container = getScrollContainer(contentRef.current);
         if (!container) return;
 
         const observer = new IntersectionObserver(handleVisibilityEntries, {
             root: container,
-            threshold: [FULL_VISIBILITY_RATIO, 1],
+            // tiny negative bottom margin to avoid 1px rounding blocking "full"
+            rootMargin: `0px 0px ${-HEIGHT_TOLERANCE_PX}px 0px`,
+            threshold: [0, 1],
         });
 
         observerRef.current = observer;
 
-        messageNodesRef.current.forEach((node) => {
-            observer.observe(node);
-        });
+        // (Re)observe everything we have already tracked
+        messageNodesRef.current.forEach((node) => observer.observe(node));
 
         return () => {
             observer.disconnect();
             observerRef.current = null;
         };
-    }, [handleVisibilityEntries, chat.chatId]);
+    }, [handleVisibilityEntries, chat.chatId, messages.length]);
 
+    /** Scroll listener using the real container */
     useEffect(() => {
-        const container = contentRef.current?.parentElement ?? contentRef.current;
+        const container = getScrollContainer(contentRef.current);
         if (!container) return;
 
         let frame = 0;
-        const handleScroll = () => {
+        const onScroll = () => {
             if (frame) cancelAnimationFrame(frame);
             frame = requestAnimationFrame(evaluateVisibleMessages);
         };
 
-        container.addEventListener("scroll", handleScroll, { passive: true });
+        container.addEventListener("scroll", onScroll, { passive: true });
         evaluateVisibleMessages();
 
         return () => {
             if (frame) cancelAnimationFrame(frame);
-            container.removeEventListener("scroll", handleScroll);
+            container.removeEventListener("scroll", onScroll);
         };
     }, [evaluateVisibleMessages, chat.chatId]);
 
-    const handleMessageNodeChange = useCallback(
-        (message: MessageResponse, node: HTMLDivElement | null) => {
-            if (!Number.isFinite(message.seq)) return;
-            const seq = message.seq;
-            const existingNode = messageNodesRef.current.get(seq);
-
-            if (node) {
-                if (existingNode && existingNode !== node) {
-                    observerRef.current?.unobserve(existingNode);
-                    nodeMetaRef.current.delete(existingNode);
-                }
-
-                messageNodesRef.current.set(seq, node);
-                nodeMetaRef.current.set(node, { seq, senderId: message.senderId ?? null });
-
-                if (observerRef.current) {
-                    observerRef.current.observe(node);
-                }
-
-                requestAnimationFrame(() => {
-                    evaluateVisibleMessages();
-                });
-            } else if (existingNode) {
-                observerRef.current?.unobserve(existingNode);
-                nodeMetaRef.current.delete(existingNode);
-                messageNodesRef.current.delete(seq);
-            }
-        },
-        [evaluateVisibleMessages]
-    );
-
+    /** Track read-state sent from server (e.g., other client or confirmation) */
     const handleIncomingReadState = useCallback((seq: number) => {
         setLastReadSeq((prev) => Math.max(prev, seq));
         latestSentSeqRef.current = Math.max(latestSentSeqRef.current, seq);
     }, []);
-
     useUserChatReadStateTopic(chat.chatId, currentUserId, handleIncomingReadState);
 
+    /** Track new incoming messages (websocket) */
     useUserChatMsgTopic(chat.chatId, (msg: MessageResponse) => {
-        setMessages((prevMessages) => [...prevMessages, msg]);
-        setNewMessageIds((prev) => new Set([...prev, msg.id]));
+        setMessages((prev) => [...prev, msg]);
+        setNewMessageIds((prev) => new Set(prev).add(msg.id));
 
         window.setTimeout(() => {
-            setNewMessageIds((prevSet) => {
-                const next = new Set(prevSet);
+            setNewMessageIds((prev) => {
+                const next = new Set(prev);
                 next.delete(msg.id);
                 return next;
             });
         }, 1000);
     });
+
+    /** Node mount/unmount => (re)observe + sweep */
+    const handleMessageNodeChange = useCallback(
+        (message: MessageResponse, node: HTMLDivElement | null) => {
+            if (!Number.isFinite(message.seq)) return;
+            const seq = message.seq;
+            const prevNode = messageNodesRef.current.get(seq);
+
+            if (node) {
+                if (prevNode && prevNode !== node) {
+                    observerRef.current?.unobserve(prevNode);
+                    nodeMetaRef.current.delete(prevNode);
+                }
+
+                messageNodesRef.current.set(seq, node);
+                nodeMetaRef.current.set(node, { seq, senderId: message.senderId ?? null });
+
+                if (observerRef.current) observerRef.current.observe(node);
+
+                // After layout settles, do a geometry sweep
+                requestAnimationFrame(evaluateVisibleMessages);
+            } else if (prevNode) {
+                observerRef.current?.unobserve(prevNode);
+                nodeMetaRef.current.delete(prevNode);
+                messageNodesRef.current.delete(seq);
+            }
+        },
+        [evaluateVisibleMessages]
+    );
 
     if (isLoading) return <LoadingSkeleton />;
 
