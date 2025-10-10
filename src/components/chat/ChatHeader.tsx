@@ -7,6 +7,7 @@ import { ChatType } from "@/enums/ChatEnum";
 import Image from "next/image";
 import { useTypingStatus } from "@/hooks/ws/useTypingStatus";
 import { useState } from "react";
+import clsx from "clsx";
 
 const ChatHeader = ({
     chat
@@ -15,7 +16,7 @@ const ChatHeader = ({
 }) => {
     const [isTyping, setIsTyping] = useState<boolean>(false);
 
-    useTypingStatus(chat.chatId, chat.secondUserId!, (isTyping) => {
+    useTypingStatus(chat.chatId, chat.currentUserId!, (isTyping) => {
         setIsTyping(isTyping);
     });
 
@@ -30,7 +31,7 @@ const ChatHeader = ({
                         <h1>
                             {chat.chatTitle}
                         </h1>
-                        {chat.type === ChatType.DM ? <p className="text-sm text-[#747881]">
+                        {chat.type === ChatType.DM ? <p className={clsx("text-sm ", isTyping ? "text-[#1468fa]" : "text-[#747881]")}>
                             {isTyping ? "Typing..." : "Online for 10 mins"}
                         </p> : ""}
                     </div>

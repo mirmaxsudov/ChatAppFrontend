@@ -8,7 +8,6 @@ import { ChatSummary } from "@/type/chat/chat";
 import { sendMessage } from "@/api/chat/chat.api";
 import useMyNotice from "@/hooks/useMyNotice";
 import NoticeEnum from "@/enums/NoticeEnum";
-import useUser from "@/store/useUser";
 import { useTypingSender } from "@/hooks/ws/useTypingSender";
 
 interface UploadedItem {
@@ -25,8 +24,7 @@ const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
     const [isTyping, setIsTyping] = useState<boolean>(false);
     const { showMessage, dismiss } = useMyNotice();
     const inputRef = useRef<HTMLInputElement>(null);
-    const { user } = useUser();
-    const { sendTyping } = useTypingSender(chat.chatId, user?.id!);
+    const { sendTyping } = useTypingSender(chat.chatId, chat.secondUserId!);
 
     // typing status management
     const typingActiveRef = useRef<boolean>(false);
