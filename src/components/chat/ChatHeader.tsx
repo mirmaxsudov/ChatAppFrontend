@@ -5,12 +5,20 @@ import { ChatSummary } from "@/type/chat/chat";
 import SavedMessageImage from "../../../public/images/savedMessage.png";
 import { ChatType } from "@/enums/ChatEnum";
 import Image from "next/image";
+import { useTypingStatus } from "@/hooks/ws/useTypingStatus";
+import { useState } from "react";
 
 const ChatHeader = ({
     chat
 }: {
     chat: ChatSummary
 }) => {
+    const [isTyping, setIsTyping] = useState<boolean>(false);
+
+    useTypingStatus(chat.chatId, chat.secondUserId!, (isTyping) => {
+        setIsTyping(isTyping);
+    });
+
     return (
         <>
             <div className={`sticky top-0 left-0 w-full dark:bg-[#23262F] z-10 py-[10px] px-[8px] flex justify-between items-center`}>
@@ -23,7 +31,7 @@ const ChatHeader = ({
                             {chat.chatTitle}
                         </h1>
                         {chat.type === ChatType.DM ? <p className="text-sm text-[#747881]">
-                            Online for 10 mins
+                            {isTyping ? "Typing..." : "Online for 10 mins"}
                         </p> : ""}
                     </div>
                 </div>
