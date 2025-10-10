@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react";
-import StickerPicker from "./StickerPicker";
 import ChatStickerDropdown from "./ChatStickerDropdown";
 import UploadDropdown from "./UploadDropdown";
 import { X } from "lucide-react";
@@ -9,6 +8,8 @@ import { ChatSummary } from "@/type/chat/chat";
 import { sendMessage } from "@/api/chat/chat.api";
 import useMyNotice from "@/hooks/useMyNotice";
 import NoticeEnum from "@/enums/NoticeEnum";
+import useUser from "@/store/useUser";
+import { useTypingSender } from "@/hooks/ws/useTypingSender";
 
 interface UploadedItem {
     file: File;
@@ -21,8 +22,18 @@ const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
     const [text, setText] = useState<string>("");
     const [uploads, setUploads] = useState<UploadedItem[]>([]);
     const [isSending, setIsSending] = useState<boolean>(false);
+    const [isTyping, setIsTyping] = useState<boolean>(false);
     const { showMessage, dismiss } = useMyNotice();
     const inputRef = useRef<HTMLInputElement>(null);
+    const { user } = useUser();
+    const { sendTyping } = useTypingSender(chat.chatId, user?.id!);
+
+    // typing status management
+    const typingActiveRef = useRef<boolean>(false);
+    const typingTimeoutRef = useRef<any>(null);
+    const TYPING_STOP_DELAY_MS = 1500;
+
+    // sendTyping provided by useTypingSender
 
     useEffect(() => {
         if (sticker) {
@@ -63,6 +74,13 @@ const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
         try {
             showMessage("Sending message...", NoticeEnum.LOADING, undefined, toastRef);
 
+            // user is actively sending while typing -> publish typing=true
+            if (text.trim().length > 0) {
+                typingActiveRef.current = true;
+                setIsTyping(true);
+                sendTyping(true);
+            }
+
             const response = await sendMessage(chat.chatId, text.trim());
 
             if (response.success) {
@@ -75,6 +93,9 @@ const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
                 dismiss(toastRef);
                 showMessage(response.message || "Failed to send message", NoticeEnum.ERROR);
             }
+            typingActiveRef.current = false;
+            setIsTyping(false);
+            sendTyping(false);
         } catch (error) {
             dismiss(toastRef);
             console.error("Error sending message:", error);
@@ -93,6 +114,51 @@ const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
             handleSendMessage();
         }
     };
+
+    const onTextChange = (value: string) => {
+        setText(value);
+
+        const hasContent = value.trim().length > 0;
+
+        // send true once on first keystroke
+        if (hasContent && !typingActiveRef.current) {
+            typingActiveRef.current = true;
+            setIsTyping(true);
+            sendTyping(true);
+        }
+
+        // if cleared, publish false immediately
+        if (!hasContent && typingActiveRef.current) {
+            typingActiveRef.current = false;
+            setIsTyping(false);
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+            sendTyping(false);
+            return;
+        }
+
+        // debounce inactivity -> false
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+        if (hasContent) {
+            typingTimeoutRef.current = setTimeout(() => {
+                if (typingActiveRef.current) {
+                    typingActiveRef.current = false;
+                    setIsTyping(false);
+                    sendTyping(false);
+                }
+            }, TYPING_STOP_DELAY_MS);
+        }
+    }
+
+    useEffect(() => {
+        return () => {
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+            if (typingActiveRef.current) {
+                typingActiveRef.current = false;
+                setIsTyping(false);
+                sendTyping(false);
+            }
+        };
+    }, []);
 
     return (
         <>
@@ -142,7 +208,7 @@ const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
                     <input
                         ref={inputRef}
                         value={text}
-                        onChange={(e) => setText(e.target.value)}
+                        onChange={(e) => onTextChange(e.target.value)}
                         onKeyPress={handleKeyPress}
                         disabled={isSending}
                         className="w-full outline-0 bg-transparent"
@@ -171,5 +237,3 @@ const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
 }
 
 export default ChatFooter;
-
-
