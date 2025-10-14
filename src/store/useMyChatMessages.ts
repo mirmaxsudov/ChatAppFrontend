@@ -31,7 +31,7 @@ const useMyChatMessages = create<MyChatMessaagesType>((set, get) => {
         },
         addMessage: (message: MessageItemResponse) => {
             const res = get().response;
-            set({ response: { ...res, items: [message, ...res.items] } })
+            set({ response: { ...res, items: [...res.items, message] } })
         }
     }
 })

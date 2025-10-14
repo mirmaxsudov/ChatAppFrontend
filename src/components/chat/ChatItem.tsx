@@ -4,9 +4,20 @@ import { ChatType } from "@/enums/ChatEnum";
 import Image from "next/image";
 import { useMyMessage } from "@/hooks/useMyMessages";
 import { toFormattedDate } from "@/helper/ts/dateFormater";
+import { useMyChatsLastMessage } from "@/hooks/ws/useChatsLastMessage";
+import useUser from "@/store/useUser";
+import useMyChat from "@/store/useMyChatResponse";
 
 const ChatItem = ({ chat }: { chat: ChatItemResponse }) => {
-    const { lastMessage } = chat;
+    console.log(chat);
+    
+    const { lastMessage, id } = chat;
+    const user = useUser(s => s.user);
+    const changeLastMessagePreview = useMyChat(state => state.changeLastMessagePreview);
+
+    useMyChatsLastMessage(id, user?.id!, (payload) => {
+        changeLastMessagePreview(payload, id);
+    });
 
     return <>
         <div className="flex justify-between items-end p-[11px] transition-all duration-300 hover:bg-[#DBDDE1] dark:hover:bg-[#272A30]">
@@ -27,9 +38,9 @@ const ChatItem = ({ chat }: { chat: ChatItemResponse }) => {
                 </div>
             </div>
             <div>
-                {lastMessage ? <p>
+                {lastMessage && <p>
                     {toFormattedDate(lastMessage.sendAt)}
-                </p> : ""}
+                </p>}
             </div>
         </div>
     </>

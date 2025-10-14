@@ -22,6 +22,7 @@ type ChatListProps = {
 const ChatList = ({ width, selectedChat, setSelectedChat }: ChatListProps) => {
     const { isLoading, isError, response } = useMyChat(s => s);
 
+
     return (
         <div style={{ width }} className="w-full relative h-full flex flex-col">
             <ChatNav />
@@ -51,14 +52,14 @@ const ChatList = ({ width, selectedChat, setSelectedChat }: ChatListProps) => {
 
                 {!isLoading && !isError && (response?.chats.items?.length ?? 0) > 0 && (
                     <div className="space-y-1">
-                        {response?.chats?.items.map((chat) => (
+                        {response?.chats?.items?.map((chat) => (
                             <div
                                 onClick={() => {
                                     setSelectedChat(chat);
                                 }}
                                 className={clsx("", {
-                                    "bg-gray-200": chat.id === selectedChat?.id
-                                })} key={chat.id} >
+                                    "bg-gray-200": chat?.id === selectedChat?.id
+                                })} key={chat?.id} >
                                 <ChatItem chat={chat} />
                             </div>
                         ))}

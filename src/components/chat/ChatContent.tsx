@@ -8,7 +8,7 @@ import { RefreshCw, AlertCircle } from "lucide-react";
 import { ChatItemResponse, ChatSummary } from "@/type/chat/chat";
 import { useMyMessages } from "@/hooks/useMyMessages";
 import useUser from "@/store/useUser";
-import { MessageItemResponse, MessageResponse } from "@/type/chat/message";
+import { MessageItemResponse } from "@/type/chat/message";
 import { useUserChatMsgTopic } from "@/hooks/ws/useUserChatMsgTopic";
 import { useUserChatReadStateTopic } from "@/hooks/ws/useUserChatReadStateTopic";
 import { linkify } from "@/helper/ts/Linkify";
@@ -17,6 +17,7 @@ import JustTextMessageLeft from "./messages/JustTextMessageLeft";
 import { ChatType } from "@/enums/ChatEnum";
 import { readMessages } from "@/api/chat/chat.api";
 import useMyChatMessages from "@/store/useMyChatMessages";
+import useMyChat from "@/store/useMyChatResponse";
 
 const READ_THROTTLE_MS = 300;
 // We'll still use our own geometry tolerance check, so 1 here is okay.
@@ -139,7 +140,8 @@ const ChatContent = ({ chat }: { chat: ChatItemResponse }) => {
     const nodeMetaRef = useRef<Map<HTMLDivElement, { seq: number; senderId: number | null }>>(new Map());
     const highestVisibleSeqRef = useRef<number>(chat.lastReadMessageSeq ?? 0);
 
-    const { setResponse, response, addMessage } = useMyChatMessages();
+    const { setResponse, response, addMessage, } = useMyChatMessages();
+    const changeLastReadMessageSeq = useMyChat(state => state.changeLastReadMessageSeq);
 
     /** Reset read seqs when chat changes */
     useEffect(() => {
@@ -309,9 +311,11 @@ const ChatContent = ({ chat }: { chat: ChatItemResponse }) => {
 
     /** Track read-state sent from server (e.g., other client or confirmation) */
     const handleIncomingReadState = useCallback((seq: number) => {
+        changeLastReadMessageSeq(seq, chat.id)
         setLastReadSeq((prev) => Math.max(prev, seq));
         latestSentSeqRef.current = Math.max(latestSentSeqRef.current, seq);
     }, []);
+
     useUserChatReadStateTopic(chat.id, currentUserId, handleIncomingReadState);
 
     /** Track new incoming messages (websocket) */
