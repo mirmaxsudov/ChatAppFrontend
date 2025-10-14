@@ -8,6 +8,7 @@ import Image from "next/image";
 import { useTypingStatus } from "@/hooks/ws/useTypingStatus";
 import { useState } from "react";
 import clsx from "clsx";
+import useUser from "@/store/useUser";
 
 const ChatHeader = ({
     chat
@@ -15,8 +16,9 @@ const ChatHeader = ({
     chat: ChatItemResponse
 }) => {
     const [isTyping, setIsTyping] = useState<boolean>(false);
+    const user = useUser(state => state.user);
 
-    useTypingStatus(chat.id, chat.ownerId!, (isTyping) => {
+    useTypingStatus(chat.id, user?.id!, (isTyping) => {
         setIsTyping(isTyping);
     });
 

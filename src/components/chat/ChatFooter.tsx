@@ -26,12 +26,9 @@ const ChatFooter = ({ chat }: { chat: ChatItemResponse }) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const { sendTyping } = useTypingSender(chat.id, chat.secondUserId!);
 
-    // typing status management
     const typingActiveRef = useRef<boolean>(false);
     const typingTimeoutRef = useRef<any>(null);
     const TYPING_STOP_DELAY_MS = 1500;
-
-    // sendTyping provided by useTypingSender
 
     useEffect(() => {
         if (sticker) {
@@ -72,11 +69,10 @@ const ChatFooter = ({ chat }: { chat: ChatItemResponse }) => {
         try {
             showMessage("Sending message...", NoticeEnum.LOADING, undefined, toastRef);
 
-            // user is actively sending while typing -> publish typing=true
             if (text.trim().length > 0) {
                 typingActiveRef.current = true;
-                setIsTyping(true);
-                sendTyping(true);
+                setIsTyping(false);
+                sendTyping(false);
             }
 
             const response = await sendMessage(chat.id, text.trim());
