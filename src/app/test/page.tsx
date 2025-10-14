@@ -23,7 +23,7 @@ const TestPage = () => {
     //         onConnect: () => {
     //             console.log("Connected to STOMP broker");
     //             const sub = client.subscribe(
-    //                 `/topic/test`,
+    //                 `/test`,
     //                 (message: IMessage) => {
     //                     console.log(message.body);
     //                 }

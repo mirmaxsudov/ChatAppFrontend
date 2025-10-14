@@ -1,21 +1,25 @@
 import { CircleArrowLeft, EllipsisVertical, PenOff, Trash, User } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { ChatSummary } from "@/type/chat/chat";
+import { ChatItemResponse, ChatSummary } from "@/type/chat/chat";
 
 import SavedMessageImage from "../../../public/images/savedMessage.png";
 import { ChatType } from "@/enums/ChatEnum";
 import Image from "next/image";
 import { useTypingStatus } from "@/hooks/ws/useTypingStatus";
 import { useState } from "react";
+import clsx from "clsx";
+import useUser from "@/store/useUser";
+import RandomProfile from "@/helper/tsx/RandomProfile";
 
 const ChatHeader = ({
     chat
 }: {
-    chat: ChatSummary
+    chat: ChatItemResponse
 }) => {
     const [isTyping, setIsTyping] = useState<boolean>(false);
+    const user = useUser(state => state.user);
 
-    useTypingStatus(chat.chatId, chat.secondUserId!, (isTyping) => {
+    useTypingStatus(chat.id, user?.id!, (isTyping) => {
         setIsTyping(isTyping);
     });
 
@@ -24,13 +28,15 @@ const ChatHeader = ({
             <div className={`sticky top-0 left-0 w-full dark:bg-[#23262F] z-10 py-[10px] px-[8px] flex justify-between items-center`}>
                 <div className="flex items-center gap-[18px]">
                     <div className="size-[40px]">
-                        <Image className="size-full rounded-full" width={40} height={40} src={chat.type === ChatType.SAVED ? SavedMessageImage.src : ""} alt="something" />
-                    </div>
+                        {chat.type === ChatType.SAVED ?
+                            <Image src={SavedMessageImage} alt="Saved Message Image" /> :
+                            <RandomProfile title={chat.title.toUpperCase() || ""} bgColor={chat.bgColor} textColor={chat.textColor} />
+                        }                    </div>
                     <div className="flex flex-col">
                         <h1>
-                            {chat.chatTitle}
+                            {chat.title}
                         </h1>
-                        {chat.type === ChatType.DM ? <p className="text-sm text-[#747881]">
+                        {chat.type === ChatType.DM ? <p className={clsx("text-sm ", isTyping ? "text-[#1468fa]" : "text-[#747881]")}>
                             {isTyping ? "Typing..." : "Online for 10 mins"}
                         </p> : ""}
                     </div>

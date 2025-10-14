@@ -4,11 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import ChatStickerDropdown from "./ChatStickerDropdown";
 import UploadDropdown from "./UploadDropdown";
 import { X } from "lucide-react";
-import { ChatSummary } from "@/type/chat/chat";
+import { ChatItemResponse, ChatSummary } from "@/type/chat/chat";
 import { sendMessage } from "@/api/chat/chat.api";
 import useMyNotice from "@/hooks/useMyNotice";
 import NoticeEnum from "@/enums/NoticeEnum";
-import useUser from "@/store/useUser";
 import { useTypingSender } from "@/hooks/ws/useTypingSender";
 
 interface UploadedItem {
@@ -17,7 +16,7 @@ interface UploadedItem {
     type: "image" | "file";
 }
 
-const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
+const ChatFooter = ({ chat }: { chat: ChatItemResponse }) => {
     const [sticker, setSticker] = useState<string | undefined>();
     const [text, setText] = useState<string>("");
     const [uploads, setUploads] = useState<UploadedItem[]>([]);
@@ -25,15 +24,11 @@ const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
     const [isTyping, setIsTyping] = useState<boolean>(false);
     const { showMessage, dismiss } = useMyNotice();
     const inputRef = useRef<HTMLInputElement>(null);
-    const { user } = useUser();
-    const { sendTyping } = useTypingSender(chat.chatId, user?.id!);
+    const { sendTyping } = useTypingSender(chat.id, chat.secondUserId!);
 
-    // typing status management
     const typingActiveRef = useRef<boolean>(false);
     const typingTimeoutRef = useRef<any>(null);
     const TYPING_STOP_DELAY_MS = 1500;
-
-    // sendTyping provided by useTypingSender
 
     useEffect(() => {
         if (sticker) {
@@ -74,14 +69,13 @@ const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
         try {
             showMessage("Sending message...", NoticeEnum.LOADING, undefined, toastRef);
 
-            // user is actively sending while typing -> publish typing=true
             if (text.trim().length > 0) {
                 typingActiveRef.current = true;
-                setIsTyping(true);
-                sendTyping(true);
+                setIsTyping(false);
+                sendTyping(false);
             }
 
-            const response = await sendMessage(chat.chatId, text.trim());
+            const response = await sendMessage(chat.id, text.trim());
 
             if (response.success) {
                 dismiss(toastRef);
