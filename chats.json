@@ -1,0 +1,98 @@
+// Chats 
+{
+    "chats": {
+        "totalCount": 100,
+        "items": [
+            // Chat Item
+            {
+                "id": 1,
+                "profileImage": {
+                    "id": 1,
+                    "": ""
+                },
+                "isOnline": true,
+                "isTyping": false,
+                "title": "Saved Messages",
+                "type": "SAVED_MESSAGE",
+                "lastReadMessageSeq": 10,
+                "lastMessage": {
+                    "title": "Something message here🫡",
+                    "sentAt": "",
+                    "isRead": false,
+                    "isMine": false
+                }, 
+                "unreadMessageCount": 10,
+                "isMute": true
+            }
+        ],
+        "pinnedChats": {
+            "totalCount": 5,
+            "availablePinnedChats": 10,
+            "chats": [
+                // Chat Item
+                {
+                    "id": 1,
+                    // If type is DM
+                    "secondUserId": 3,
+                    "ownerId": 2,
+                    "profileImage": {
+                        "id": 1,
+                        "": ""
+                    },
+                    "isOnline": true,
+                    // If type is Group
+                    "countOfOnlines": 300,
+                    "membresCount": 1000,
+                    "title": "Saved Messages",
+                    "type": "SAVED_MESSAGE",
+                    "lastReadMessageSeq": 10,
+                    "lastMessage": {
+                        "title": "Something message here🫡",
+                        "sentAt": "",
+                        "isRead": false,
+                        "isMine": false
+                    }, 
+                    "unreadMessageCount": 10,
+                    "isMute": true,
+                    "priority": 1
+                }
+            ]
+        }
+    }
+}
+
+// Chat message state
+
+{
+    "messages": {
+        "items": {
+            "id": 1, 
+            "message": "Something",
+            "attachments": [],
+            "files": [],
+            "sendAt": "Some date",
+            "seq": 41,
+            "replyMessage": {
+                "replyMessageId": 4,
+                "attachment": {},
+                "title": "Something",
+            },
+            "owner": {
+                "userId",
+                "profileImage": {}
+            },
+            "linkPreviewResponse": {
+                "id": 1,
+                "url": "",
+                "title": "title",
+                "description": "desc",
+                "imageUrl": "",
+                "siteName": "name",
+                "faviconUrl": "",
+                "contentType": "",
+                "status": "",
+            }
+        }
+    },
+    "chatId": 1,
+}

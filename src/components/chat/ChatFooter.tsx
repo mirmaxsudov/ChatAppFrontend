@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import ChatStickerDropdown from "./ChatStickerDropdown";
 import UploadDropdown from "./UploadDropdown";
 import { X } from "lucide-react";
-import { ChatSummary } from "@/type/chat/chat";
+import { ChatItemResponse, ChatSummary } from "@/type/chat/chat";
 import { sendMessage } from "@/api/chat/chat.api";
 import useMyNotice from "@/hooks/useMyNotice";
 import NoticeEnum from "@/enums/NoticeEnum";
@@ -16,7 +16,7 @@ interface UploadedItem {
     type: "image" | "file";
 }
 
-const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
+const ChatFooter = ({ chat }: { chat: ChatItemResponse }) => {
     const [sticker, setSticker] = useState<string | undefined>();
     const [text, setText] = useState<string>("");
     const [uploads, setUploads] = useState<UploadedItem[]>([]);
@@ -24,7 +24,7 @@ const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
     const [isTyping, setIsTyping] = useState<boolean>(false);
     const { showMessage, dismiss } = useMyNotice();
     const inputRef = useRef<HTMLInputElement>(null);
-    const { sendTyping } = useTypingSender(chat.chatId, chat.secondUserId!);
+    const { sendTyping } = useTypingSender(chat.id, chat.secondUserId!);
 
     // typing status management
     const typingActiveRef = useRef<boolean>(false);
@@ -79,7 +79,7 @@ const ChatFooter = ({ chat }: { chat: ChatSummary }) => {
                 sendTyping(true);
             }
 
-            const response = await sendMessage(chat.chatId, text.trim());
+            const response = await sendMessage(chat.id, text.trim());
 
             if (response.success) {
                 dismiss(toastRef);

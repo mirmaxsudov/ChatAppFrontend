@@ -3,11 +3,7 @@ import { Input } from "../ui/input";
 import { DropdownMenu, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import ChatNavDropDown from "./ChatNavDropDown";
 
-const ChatNav = ({
-    setSavedChat
-}: {
-    setSavedChat: () => void
-}) => {
+const ChatNav = () => {
     return (
         <div
             className="p-2 flex items-center justify-between gap-5 w-full bg-gray-100 dark:bg-[#23262F] border-r border-gray-200 dark:border-[#23262F]">
@@ -16,7 +12,7 @@ const ChatNav = ({
                     <DropdownMenuTrigger asChild>
                         <Menu />
                     </DropdownMenuTrigger>
-                    <ChatNavDropDown setSavedChat={setSavedChat} />
+                    <ChatNavDropDown />
                 </DropdownMenu>
             </div>
             <div className="flex-1">

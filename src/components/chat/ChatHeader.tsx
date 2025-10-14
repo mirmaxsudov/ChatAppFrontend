@@ -1,6 +1,6 @@
 import { CircleArrowLeft, EllipsisVertical, PenOff, Trash, User } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { ChatSummary } from "@/type/chat/chat";
+import { ChatItemResponse, ChatSummary } from "@/type/chat/chat";
 
 import SavedMessageImage from "../../../public/images/savedMessage.png";
 import { ChatType } from "@/enums/ChatEnum";
@@ -12,11 +12,11 @@ import clsx from "clsx";
 const ChatHeader = ({
     chat
 }: {
-    chat: ChatSummary
+    chat: ChatItemResponse
 }) => {
     const [isTyping, setIsTyping] = useState<boolean>(false);
 
-    useTypingStatus(chat.chatId, chat.currentUserId!, (isTyping) => {
+    useTypingStatus(chat.id, chat.ownerId!, (isTyping) => {
         setIsTyping(isTyping);
     });
 
@@ -29,7 +29,7 @@ const ChatHeader = ({
                     </div>
                     <div className="flex flex-col">
                         <h1>
-                            {chat.chatTitle}
+                            {chat.title}
                         </h1>
                         {chat.type === ChatType.DM ? <p className={clsx("text-sm ", isTyping ? "text-[#1468fa]" : "text-[#747881]")}>
                             {isTyping ? "Typing..." : "Online for 10 mins"}

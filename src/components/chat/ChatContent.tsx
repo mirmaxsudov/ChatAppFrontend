@@ -1,14 +1,14 @@
-    "use client";
+"use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RefreshCw, AlertCircle } from "lucide-react";
-import { ChatSummary } from "@/type/chat/chat";
+import { ChatItemResponse, ChatSummary } from "@/type/chat/chat";
 import { useMyMessages } from "@/hooks/useMyMessages";
 import useUser from "@/store/useUser";
-import { MessageResponse } from "@/type/chat/message";
+import { MessageItemResponse, MessageResponse } from "@/type/chat/message";
 import { useUserChatMsgTopic } from "@/hooks/ws/useUserChatMsgTopic";
 import { useUserChatReadStateTopic } from "@/hooks/ws/useUserChatReadStateTopic";
 import { linkify } from "@/helper/ts/Linkify";
@@ -16,6 +16,7 @@ import JustTextMessageRight from "./messages/JustTextMessageRight";
 import JustTextMessageLeft from "./messages/JustTextMessageLeft";
 import { ChatType } from "@/enums/ChatEnum";
 import { readMessages } from "@/api/chat/chat.api";
+import useMyChatMessages from "@/store/useMyChatMessages";
 
 const READ_THROTTLE_MS = 300;
 // We'll still use our own geometry tolerance check, so 1 here is okay.
@@ -119,12 +120,11 @@ const AnimatedMessage = ({
     );
 };
 
-const ChatContent = ({ chat }: { chat: ChatSummary }) => {
-    const { data, isLoading, isError, refetch } = useMyMessages(chat.chatId);
+const ChatContent = ({ chat }: { chat: ChatItemResponse }) => {
+    const { data, isLoading, isError, refetch } = useMyMessages(chat.id);
     const currentUser = useUser((state) => state.user);
     const currentUserId = currentUser?.id ?? null;
 
-    const [messages, setMessages] = useState<MessageResponse[]>([]);
     const [newMessageIds, setNewMessageIds] = useState<Set<number>>(new Set());
     const [lastReadSeq, setLastReadSeq] = useState<number>(chat.lastReadMessageSeq ?? 0);
 
@@ -139,26 +139,28 @@ const ChatContent = ({ chat }: { chat: ChatSummary }) => {
     const nodeMetaRef = useRef<Map<HTMLDivElement, { seq: number; senderId: number | null }>>(new Map());
     const highestVisibleSeqRef = useRef<number>(chat.lastReadMessageSeq ?? 0);
 
+    const { setResponse, response, addMessage } = useMyChatMessages();
+
     /** Reset read seqs when chat changes */
     useEffect(() => {
         const initialSeq = chat.lastReadMessageSeq ?? 0;
         setLastReadSeq(initialSeq);
         latestSentSeqRef.current = initialSeq;
         highestVisibleSeqRef.current = initialSeq;
-    }, [chat.chatId, chat.lastReadMessageSeq]);
+    }, [chat.id, chat.lastReadMessageSeq]);
 
     /** Clear node maps when chat changes */
     useEffect(() => {
         messageNodesRef.current.forEach((node) => observerRef.current?.unobserve(node));
         messageNodesRef.current.clear();
         nodeMetaRef.current.clear();
-    }, [chat.chatId]);
+    }, [chat.id]);
 
     /** Load messages -> reset "new" markers */
     useEffect(() => {
         if (!isLoading && !isError && data?.data) {
-            setMessages(data.data);
             setNewMessageIds(new Set());
+            setResponse(data.data);
         }
     }, [data, isLoading, isError]);
 
@@ -192,14 +194,14 @@ const ChatContent = ({ chat }: { chat: ChatSummary }) => {
                 if (!toSend || toSend <= latestSentSeqRef.current) return;
 
                 try {
-                    await readMessages(chat.chatId, toSend);
+                    await readMessages(chat.id, toSend);
                     latestSentSeqRef.current = toSend;
                 } catch (error) {
                     console.error("Failed to update read messages", error);
                 }
             }, READ_THROTTLE_MS);
         },
-        [chat.chatId, chat.type]
+        [chat.id, chat.type]
     );
 
     /** Geometry fallback sweep — checks all nodes for full visibility */
@@ -283,7 +285,7 @@ const ChatContent = ({ chat }: { chat: ChatSummary }) => {
             observer.disconnect();
             observerRef.current = null;
         };
-    }, [handleVisibilityEntries, chat.chatId, messages.length]);
+    }, [handleVisibilityEntries, chat.id, data?.data.items?.length]);
 
     /** Scroll listener using the real container */
     useEffect(() => {
@@ -303,19 +305,19 @@ const ChatContent = ({ chat }: { chat: ChatSummary }) => {
             if (frame) cancelAnimationFrame(frame);
             container.removeEventListener("scroll", onScroll);
         };
-    }, [evaluateVisibleMessages, chat.chatId]);
+    }, [evaluateVisibleMessages, chat.id]);
 
     /** Track read-state sent from server (e.g., other client or confirmation) */
     const handleIncomingReadState = useCallback((seq: number) => {
         setLastReadSeq((prev) => Math.max(prev, seq));
         latestSentSeqRef.current = Math.max(latestSentSeqRef.current, seq);
     }, []);
-    useUserChatReadStateTopic(chat.chatId, currentUserId, handleIncomingReadState);
+    useUserChatReadStateTopic(chat.id, currentUserId, handleIncomingReadState);
 
     /** Track new incoming messages (websocket) */
-    useUserChatMsgTopic(chat.chatId, (msg: MessageResponse) => {
-        setMessages((prev) => [...prev, msg]);
+    useUserChatMsgTopic(chat.id, (msg: MessageItemResponse) => {
         setNewMessageIds((prev) => new Set(prev).add(msg.id));
+        addMessage(msg);
 
         window.setTimeout(() => {
             setNewMessageIds((prev) => {
@@ -328,7 +330,7 @@ const ChatContent = ({ chat }: { chat: ChatSummary }) => {
 
     /** Node mount/unmount => (re)observe + sweep */
     const handleMessageNodeChange = useCallback(
-        (message: MessageResponse, node: HTMLDivElement | null) => {
+        (message: MessageItemResponse, node: HTMLDivElement | null) => {
             if (!Number.isFinite(message.seq)) return;
             const seq = message.seq;
             const prevNode = messageNodesRef.current.get(seq);
@@ -340,11 +342,10 @@ const ChatContent = ({ chat }: { chat: ChatSummary }) => {
                 }
 
                 messageNodesRef.current.set(seq, node);
-                nodeMetaRef.current.set(node, { seq, senderId: message.senderId ?? null });
+                nodeMetaRef.current.set(node, { seq, senderId: message.owner.userId ?? null });
 
                 if (observerRef.current) observerRef.current.observe(node);
 
-                // After layout settles, do a geometry sweep
                 requestAnimationFrame(evaluateVisibleMessages);
             } else if (prevNode) {
                 observerRef.current?.unobserve(prevNode);
@@ -359,7 +360,7 @@ const ChatContent = ({ chat }: { chat: ChatSummary }) => {
 
     if (isError) return <ErrorState onRetry={() => refetch()} />;
 
-    if (!messages || messages.length === 0) {
+    if (!response?.items || response?.items?.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center p-8 space-y-4 text-muted-foreground">
                 <div className="text-center">
@@ -372,14 +373,14 @@ const ChatContent = ({ chat }: { chat: ChatSummary }) => {
 
     return (
         <div ref={contentRef} className="space-y-4 p-4">
-            {messages.map((message) => {
-                const isOwn = message.senderId === currentUserId;
-                const formattedText = linkify(message.text);
+            {response.items?.map((message) => {
+                const isOwn = message.owner.userId === currentUserId;
+                const formattedText = linkify(message.message);
                 const isRead = isOwn && message.seq <= lastReadSeq;
 
                 return (
                     <AnimatedMessage
-                        key={message.id ?? `${message.seq}-${message.senderId}`}
+                        key={message.id ?? `${message.seq}-${message.owner.userId}`}
                         formattedText={formattedText}
                         isOwn={isOwn}
                         isRead={isRead}

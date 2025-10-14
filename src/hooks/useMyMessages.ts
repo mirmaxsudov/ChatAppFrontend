@@ -6,8 +6,8 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 
 const BASE_URL: string = "/api/v1/chat";
 
-async function fetchMyMessages(chatId: number, size: number, page: number): Promise<PageApiResponse<MessageResponse[]>> {
-    const response = await $api.get<PageApiResponse<MessageResponse[]>>(BASE_URL + "/get-messages/" + chatId, {
+async function fetchMyMessages(chatId: number, size: number, page: number): Promise<PageApiResponse<MessageResponse>> {
+    const response = await $api.get<PageApiResponse<MessageResponse>>(BASE_URL + "/get-messages/" + chatId, {
         params: {
             size: 1000,
             page: 0
