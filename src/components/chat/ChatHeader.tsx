@@ -9,6 +9,7 @@ import { useTypingStatus } from "@/hooks/ws/useTypingStatus";
 import { useState } from "react";
 import clsx from "clsx";
 import useUser from "@/store/useUser";
+import RandomProfile from "@/helper/tsx/RandomProfile";
 
 const ChatHeader = ({
     chat
@@ -27,8 +28,10 @@ const ChatHeader = ({
             <div className={`sticky top-0 left-0 w-full dark:bg-[#23262F] z-10 py-[10px] px-[8px] flex justify-between items-center`}>
                 <div className="flex items-center gap-[18px]">
                     <div className="size-[40px]">
-                        <Image className="size-full rounded-full" width={40} height={40} src={chat.type === ChatType.SAVED ? SavedMessageImage.src : ""} alt="something" />
-                    </div>
+                        {chat.type === ChatType.SAVED ?
+                            <Image src={SavedMessageImage} alt="Saved Message Image" /> :
+                            <RandomProfile title={chat.title.toUpperCase() || ""} bgColor={chat.bgColor} textColor={chat.textColor} />
+                        }                    </div>
                     <div className="flex flex-col">
                         <h1>
                             {chat.title}

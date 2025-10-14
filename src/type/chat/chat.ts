@@ -38,6 +38,8 @@ export interface ChatItemResponse {
     lastMessage: ChatItemMessagePreview;
     unreadMessageCount: number;
     isMute: boolean;
+    bgColor: string;
+    textColor: string;
 }
 
 export interface PinnedChatsResponse {
@@ -56,4 +58,9 @@ export type ChatItemMessagePreview = {
     sendAt: Date;
     isRead: boolean;
     isMine: boolean;
+}
+
+export type ChatMessageUpdateType = {
+    text: string;
+    messageId: number;
 }

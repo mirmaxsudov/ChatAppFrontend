@@ -18,6 +18,7 @@ import { ChatType } from "@/enums/ChatEnum";
 import { readMessages } from "@/api/chat/chat.api";
 import useMyChatMessages from "@/store/useMyChatMessages";
 import useMyChat from "@/store/useMyChatResponse";
+import useMessageUpdate from "@/hooks/ws/useMessageUpdate";
 
 const READ_THROTTLE_MS = 300;
 // We'll still use our own geometry tolerance check, so 1 here is okay.
@@ -140,8 +141,9 @@ const ChatContent = ({ chat }: { chat: ChatItemResponse }) => {
     const nodeMetaRef = useRef<Map<HTMLDivElement, { seq: number; senderId: number | null }>>(new Map());
     const highestVisibleSeqRef = useRef<number>(chat.lastReadMessageSeq ?? 0);
 
-    const { setResponse, response, addMessage, } = useMyChatMessages();
+    const { setResponse, response, addMessage, updateMessage } = useMyChatMessages();
     const changeLastReadMessageSeq = useMyChat(state => state.changeLastReadMessageSeq);
+    useMessageUpdate(chat.id, updateMessage)
 
     /** Reset read seqs when chat changes */
     useEffect(() => {
