@@ -77,12 +77,14 @@ const AnimatedMessage = ({
     isOwn,
     isRead,
     isNew = false,
+    sentAt,
     onNodeChange,
 }: {
     formattedText: string;
     isOwn: boolean;
     isRead: boolean;
     isNew?: boolean;
+    sentAt: Date | string,
     onNodeChange?: (node: HTMLDivElement | null) => void;
 }) => {
     const messageRef = useRef<HTMLDivElement>(null);
@@ -114,9 +116,9 @@ const AnimatedMessage = ({
             }}
         >
             {isOwn ? (
-                <JustTextMessageRight message={formattedText} isRead={isRead} />
+                <JustTextMessageRight message={formattedText} isRead={isRead} sentAt={sentAt} />
             ) : (
-                <JustTextMessageLeft message={formattedText} />
+                <JustTextMessageLeft message={formattedText} sentAt={sentAt} />
             )}
         </div>
     );
@@ -391,6 +393,7 @@ const ChatContent = ({ chat }: { chat: ChatItemResponse }) => {
                         isOwn={isOwn}
                         isRead={isRead}
                         isNew={message.id ? newMessageIds.has(message.id) : false}
+                        sentAt={message.sentAt}
                         onNodeChange={(node) => handleMessageNodeChange(message, node)}
                     />
                 );

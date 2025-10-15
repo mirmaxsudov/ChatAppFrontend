@@ -1,5 +1,6 @@
 "use client";
 
+import { toTimeFormatted } from "@/helper/ts/dateFormater";
 import { BOTH_SIDE_READ, SINGLE_READ } from "@/helper/tsx/MessageReadTypes";
 import * as ContextMenu from "@radix-ui/react-context-menu";
 import { styled } from "styled-components";
@@ -43,7 +44,7 @@ const StyledSeparator = styled(ContextMenu.Separator)`
   margin: 4px 0;
 `;
 
-const JustTextMessageRight = ({ message, isRead = false }: { message: string; isRead?: boolean }) => {
+const JustTextMessageRight = ({ message, isRead = false, sentAt }: { message: string; isRead?: boolean, sentAt: Date | string }) => {
   return <>
     <ContextMenu.Root>
       <ContextMenu.Trigger asChild>
@@ -53,7 +54,7 @@ const JustTextMessageRight = ({ message, isRead = false }: { message: string; is
             <div className="flex mt-[4px] items-center justify-end gap-[5px]">
               {isRead ? BOTH_SIDE_READ : SINGLE_READ}
               <p className="text-[#747881] text-end text-[10px]">
-                2:16 PM
+                {toTimeFormatted(sentAt)}
               </p>
             </div>
           </div>
