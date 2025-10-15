@@ -47,7 +47,7 @@ const JustTextMessageRight = ({ message, isRead = false, sentAt }: {
           />
           <ContextMenuItem
             onSelect={() => console.log("copy link")}
-            label="Copy Link"
+            label="Copy"
             icon={<CopyIcon className="w-4 h-4" />}
           />
 

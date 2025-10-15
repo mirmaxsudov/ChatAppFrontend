@@ -28,27 +28,26 @@ import { useState } from "react";
 import OwnProfile from "@/components/chat/modal/profile/OwnProfile";
 import { useRouter } from "next/navigation";
 import NewChannelModal from "./modal/NewChannelModal";
+import useMyModals from "@/store/useMyModals";
+import UpdateMessageModal from "./modal/UpdateMessageModal";
 
 const ChatNavDropDown = () => {
     const { theme, setTheme } = useTheme();
     const user = useUser((state) => state.user);
-    const [opens, setOpens] = useState({
-        newMessageModal: false,
-        profileModal: false,
-        newChannelModal: false
-    });
+    const { newChannelModal, profileModal, newMessageModal, updateMessageModal, updateVal } = useMyModals();
+
     const clearUser = useUser(state => state.clearUser);
 
     const router = useRouter();
 
     const setNewMessageModal = (val: boolean) =>
-        setOpens((prev) => ({ ...prev, newMessageModal: val }));
+        updateVal("newMessageModal", val);
 
     const setProfileModal = (val: boolean) =>
-        setOpens((prev) => ({ ...prev, profileModal: val }));
+        updateVal("profileModal", val);
 
     const setNewChannelModal = (val: boolean) =>
-        setOpens(prev => ({ ...prev, newChannelModal: val }));
+        updateVal("newChannelModal", val);
 
     const handleSavedMessages = () => {
         // TODO
@@ -83,9 +82,9 @@ const ChatNavDropDown = () => {
                         <SaveAll width={16} className={"text-[#8292A8] mr-[5px]"} /> Messages
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent className="dark:bg-[#0F172B]">
-                        <DropdownMenuItem className={"cursor-pointer"} onClick={() => setOpens({
-                            ...opens, newMessageModal: true
-                        })}>
+                        <DropdownMenuItem className={"cursor-pointer"} onClick={() => {
+                            setNewMessageModal(true);
+                        }}>
                             <Pen /> New Direct Message
                         </DropdownMenuItem>
                         <DropdownMenuItem>
@@ -119,9 +118,11 @@ const ChatNavDropDown = () => {
                     <User /> Sign out
                 </DropdownMenuItem>
             </DropdownMenuContent>
-            <OwnProfile open={opens.profileModal} setOpen={setProfileModal} />
-            <NewMessageModal open={opens.newMessageModal} setOpen={setNewMessageModal} />
-            <NewChannelModal open={opens.newChannelModal} setOpen={setNewChannelModal} />
+            {/* Modals */}
+            <OwnProfile open={profileModal} setOpen={setProfileModal} />
+            <NewMessageModal open={newMessageModal} setOpen={setNewMessageModal} />
+            <NewChannelModal open={newChannelModal} setOpen={setNewChannelModal} />
+            <UpdateMessageModal open={updateMessageModal} setOpen={updateVal} />
         </>
     );
 };
