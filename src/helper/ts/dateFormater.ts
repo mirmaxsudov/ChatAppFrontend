@@ -22,3 +22,25 @@ export function toFormattedDate(
         return null;
     }
 }
+
+export function toTimeFormatted(
+    dateInput: string | Date,
+    locale: string = 'en-US'
+) {
+    try {
+        const date = new Date(dateInput);
+
+        if (isNaN(date.getTime())) {
+            return null;
+        }
+
+        const options: Intl.DateTimeFormatOptions = {
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+
+        return new Intl.DateTimeFormat(locale, options).format(date);
+    } catch (err) {
+        return null;
+    }
+}

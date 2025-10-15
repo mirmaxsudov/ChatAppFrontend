@@ -1,6 +1,8 @@
 "use client";
 
-const JustTextMessageLeft = ({ message }: { message: string }) => {
+import { toTimeFormatted } from "@/helper/ts/dateFormater";
+
+const JustTextMessageLeft = ({ message, sentAt }: { message: string, sentAt: string | Date }) => {
     return <>
         <div className="flex flex-row gap-[8px] items-start my-[5px]">
             <div className="size-[36px] self-end">
@@ -13,7 +15,7 @@ const JustTextMessageLeft = ({ message }: { message: string }) => {
                     }}>
                     </p>
                     <p className="text-[#747881] mt-[4px] text-start text-[10px]">
-                        2:16 PM
+                        {toTimeFormatted(sentAt)} 
                     </p>
                 </div>
             </div>

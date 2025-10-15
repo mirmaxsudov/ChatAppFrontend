@@ -58,7 +58,7 @@ const ChatList = ({ width, selectedChat, setSelectedChat }: ChatListProps) => {
                                     setSelectedChat(chat);
                                 }}
                                 className={clsx("", {
-                                    "bg-gray-200": chat?.id === selectedChat?.id
+                                    "bg-gray-200 dark:bg-[#272A30]": chat?.id === selectedChat?.id
                                 })} key={chat?.id} >
                                 <ChatItem chat={chat} />
                             </div>

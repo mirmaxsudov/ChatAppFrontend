@@ -31,4 +31,13 @@ const readMessages = async (chatId: number, lastReadMessageSeq: number): Promise
     return response.data;
 }
 
-export { newStartChat, sendMessage, readMessages };
+const updateMessage = async (chatId: number, messageId: number, text: string): Promise<ApiResponse<string>> => {
+    const response = await $api.patch(BASE_URL + "/update/" + chatId + "/" + messageId, undefined, {
+        params: {
+            text
+        }
+    });
+    return response.data;
+}
+
+export { newStartChat, sendMessage, readMessages, updateMessage };
