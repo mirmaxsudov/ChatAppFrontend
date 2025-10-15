@@ -13,6 +13,8 @@ import { useUserChatMsgTopic } from "@/hooks/ws/useUserChatMsgTopic";
 import { useUserChatReadStateTopic } from "@/hooks/ws/useUserChatReadStateTopic";
 import { linkify } from "@/helper/ts/Linkify";
 import JustTextMessageRight from "./messages/JustTextMessageRight";
+import UpdateMessageModal from "./modal/UpdateMessageModal";
+import useMyModals from "@/store/useMyModals";
 import JustTextMessageLeft from "./messages/JustTextMessageLeft";
 import { ChatType } from "@/enums/ChatEnum";
 import { readMessages } from "@/api/chat/chat.api";
@@ -77,14 +79,16 @@ const AnimatedMessage = ({
     isOwn,
     isRead,
     isNew = false,
-    sentAt,
+    chat,
+    message,
     onNodeChange,
 }: {
     formattedText: string;
     isOwn: boolean;
     isRead: boolean;
     isNew?: boolean;
-    sentAt: Date | string,
+    chat: ChatItemResponse,
+    message: MessageItemResponse,
     onNodeChange?: (node: HTMLDivElement | null) => void;
 }) => {
     const messageRef = useRef<HTMLDivElement>(null);
@@ -116,15 +120,27 @@ const AnimatedMessage = ({
             }}
         >
             {isOwn ? (
-                <JustTextMessageRight message={formattedText} isRead={isRead} sentAt={sentAt} />
+                <JustTextMessageRight
+                    message={formattedText}
+                    isRead={isRead}
+                    sentAt={message.sentAt}
+                    messageId={message.id}
+                    edited={message.isEdited}
+                    editedAt={message.editedAt}
+                    chatId={chat.id} />
             ) : (
-                <JustTextMessageLeft message={formattedText} sentAt={sentAt} />
+                <JustTextMessageLeft
+                    isEdited={message.isEdited}
+                    chat={chat}
+                    message={formattedText}
+                    sentAt={message.sentAt} />
             )}
         </div>
     );
 };
 
 const ChatContent = ({ chat }: { chat: ChatItemResponse }) => {
+    const { updateMessageModal, updateMessageData, setUpdateMessageData, updateVal } = useMyModals();
     const { data, isLoading, isError, refetch } = useMyMessages(chat.id);
     const currentUser = useUser((state) => state.user);
     const currentUserId = currentUser?.id ?? null;
@@ -136,7 +152,7 @@ const ChatContent = ({ chat }: { chat: ChatItemResponse }) => {
 
     const latestSentSeqRef = useRef<number>(chat.lastReadMessageSeq ?? 0);
     const pendingSeqRef = useRef<number | null>(null);
-    const throttleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const throttleRef = useRef<number | null>(null);
 
     const observerRef = useRef<IntersectionObserver | null>(null);
     const messageNodesRef = useRef<Map<number, HTMLDivElement>>(new Map());
@@ -145,6 +161,7 @@ const ChatContent = ({ chat }: { chat: ChatItemResponse }) => {
 
     const { setResponse, response, addMessage, updateMessage } = useMyChatMessages();
     const changeLastReadMessageSeq = useMyChat(state => state.changeLastReadMessageSeq);
+
     useMessageUpdate(chat.id, updateMessage)
 
     /** Reset read seqs when chat changes */
@@ -388,16 +405,30 @@ const ChatContent = ({ chat }: { chat: ChatItemResponse }) => {
 
                 return (
                     <AnimatedMessage
+                        chat={chat}
+                        message={message}
                         key={message.id ?? `${message.seq}-${message.owner.userId}`}
                         formattedText={formattedText}
                         isOwn={isOwn}
                         isRead={isRead}
                         isNew={message.id ? newMessageIds.has(message.id) : false}
-                        sentAt={message.sentAt}
                         onNodeChange={(node) => handleMessageNodeChange(message, node)}
                     />
                 );
             })}
+            <UpdateMessageModal
+                open={updateMessageModal}
+                setOpen={(val: boolean) => updateVal("updateMessageModal", val)}
+                chatId={updateMessageData?.chatId ?? chat.id}
+                messageId={updateMessageData?.messageId ?? undefined}
+                text={updateMessageData?.text ?? ""}
+                onUpdated={(newText) => {
+                    if (updateMessageData?.messageId) {
+                        useMyChatMessages.getState().updateMessage({ messageId: updateMessageData.messageId, text: newText });
+                    }
+                    setUpdateMessageData(null);
+                }}
+            />
         </div>
     );
 };

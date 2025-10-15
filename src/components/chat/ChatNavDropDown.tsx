@@ -34,7 +34,7 @@ import UpdateMessageModal from "./modal/UpdateMessageModal";
 const ChatNavDropDown = () => {
     const { theme, setTheme } = useTheme();
     const user = useUser((state) => state.user);
-    const { newChannelModal, profileModal, newMessageModal, updateMessageModal, updateVal } = useMyModals();
+    const { newChannelModal, profileModal, newMessageModal, updateVal } = useMyModals();
 
     const clearUser = useUser(state => state.clearUser);
 
@@ -122,7 +122,6 @@ const ChatNavDropDown = () => {
             <OwnProfile open={profileModal} setOpen={setProfileModal} />
             <NewMessageModal open={newMessageModal} setOpen={setNewMessageModal} />
             <NewChannelModal open={newChannelModal} setOpen={setNewChannelModal} />
-            <UpdateMessageModal open={updateMessageModal} setOpen={updateVal} />
         </>
     );
 };

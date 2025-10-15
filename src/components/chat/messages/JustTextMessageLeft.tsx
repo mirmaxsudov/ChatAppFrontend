@@ -1,22 +1,32 @@
 "use client";
 
 import { toTimeFormatted } from "@/helper/ts/dateFormater";
+import RandomProfile from "@/helper/tsx/RandomProfile";
+import { ChatItemResponse } from "@/type/chat/chat";
 
-const JustTextMessageLeft = ({ message, sentAt }: { message: string, sentAt: string | Date }) => {
+const JustTextMessageLeft = ({ chat, message, sentAt, isEdited }: { chat: ChatItemResponse, message: string, sentAt: string | Date, isEdited: boolean }) => {
     return <>
         <div className="flex flex-row gap-[8px] items-start my-[5px]">
             <div className="size-[36px] self-end">
-                <img className="size-full rounded-full object-cover" src="https://cdn.prod.website-files.com/62d84e447b4f9e7263d31e94/6399a4d27711a5ad2c9bf5cd_ben-sweet-2LowviVHZ-E-unsplash-1.jpeg" alt="image" />
+                <RandomProfile title={chat.title.toUpperCase() || ""} bgColor={chat.bgColor} textColor={chat.textColor} />
             </div>
             <div className="bg-[#E9EAED] rounded-[10px] break-all dark:text-[#fff] text-[#080707] py-[8px] px-[16px] dark:bg-[#23262F] text-justify w-fit max-w-[426px]">
                 <div>
                     <p className="text-[14px]" dangerouslySetInnerHTML={{
                         __html: message
-                    }}>
-                    </p>
-                    <p className="text-[#747881] mt-[4px] text-start text-[10px]">
-                        {toTimeFormatted(sentAt)} 
-                    </p>
+                    }} />
+                    <div className="flex gap-1">
+                        <p className="text-[#747881] mt-[4px] text-start text-[10px]">
+                            {toTimeFormatted(sentAt)}
+                        </p>
+                        {
+                            isEdited && <>
+                                <p className="text-[#747881] mt-[4px] text-start text-[10px]">
+                                    Edited
+                                </p>
+                            </>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
