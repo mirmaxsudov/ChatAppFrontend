@@ -5,10 +5,7 @@ import { ChatItemResponse, ChatSummary } from "@/type/chat/chat";
 import SavedMessageImage from "../../../public/images/savedMessage.png";
 import { ChatType } from "@/enums/ChatEnum";
 import Image from "next/image";
-import { useTypingStatus } from "@/hooks/ws/useTypingStatus";
-import { useState } from "react";
 import clsx from "clsx";
-import useUser from "@/store/useUser";
 import RandomProfile from "@/helper/tsx/RandomProfile";
 
 const ChatHeader = ({
@@ -16,13 +13,6 @@ const ChatHeader = ({
 }: {
     chat: ChatItemResponse
 }) => {
-    const [isTyping, setIsTyping] = useState<boolean>(false);
-    const user = useUser(state => state.user);
-
-    useTypingStatus(chat.id, user?.id!, (isTyping) => {
-        setIsTyping(isTyping);
-    });
-
     return (
         <>
             <div className={`sticky top-0 left-0 w-full dark:bg-[#23262F] z-10 py-[10px] px-[8px] flex justify-between items-center`}>
@@ -36,8 +26,10 @@ const ChatHeader = ({
                         <h1>
                             {chat.title}
                         </h1>
-                        {chat.type === ChatType.DM ? <p className={clsx("text-sm ", isTyping ? "text-[#1468fa]" : "text-[#747881]")}>
-                            {isTyping ? "Typing..." : "Online for 10 mins"}
+                        {chat.type === ChatType.DM ? <p className={clsx("text-sm ", chat.isTyping || chat.isOnline ? "text-[#1468fa]" : "text-[#747881]")}>
+                            {chat.isTyping ? "Typing..." : (
+                                chat.isOnline ? "Online" : "Last Seen Recently"
+                            )}
                         </p> : ""}
                     </div>
                 </div>

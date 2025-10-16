@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { ws } from "@/lib/ws/stompClient";
 
 type ReadStateOptions = {
@@ -35,6 +35,8 @@ export function useUserChatReadStateTopic(
     onMessage: (lastReadSeq: number) => void,
     opts?: ReadStateOptions,
 ) {
+    const handlerRef = useRef(onMessage);
+    handlerRef.current = onMessage;
     useEffect(() => {
         if (!chatId || !userId) return;
 
@@ -42,9 +44,9 @@ export function useUserChatReadStateTopic(
         const unSub = ws.subscribe(destination, (payload) => {
             const parsed = toNumber(payload);
             if (parsed !== null)
-                onMessage(parsed);
+                handlerRef.current(parsed);
         }, opts);
 
         return () => unSub?.();
-    }, [chatId, userId, onMessage, JSON.stringify(opts)]);
+    }, [chatId, userId, opts?.ack, JSON.stringify(opts?.headers)]);
 }

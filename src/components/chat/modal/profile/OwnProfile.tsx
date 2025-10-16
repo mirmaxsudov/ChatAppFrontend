@@ -354,8 +354,6 @@ export default function OwnProfile({open, setOpen}: OwnProfileProps) {
         });
     };
 
-    console.log("Open", open);
-
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="w-[1200px] max-h-[90vh] overflow-y-auto scrollbar-hide">

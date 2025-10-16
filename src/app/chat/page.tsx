@@ -6,7 +6,9 @@ import ChatHeader from "@/components/chat/ChatHeader";
 import ChatList from "@/components/chat/ChatList";
 import AuthChecker from "@/helper/tsx/AuthChecker";
 import { useMyChats } from "@/hooks/useMyChats";
+import { useOnlineStatusSender } from "@/hooks/ws/useOnlineStatusSender";
 import useMyChat from "@/store/useMyChatResponse";
+import useUser from "@/store/useUser";
 import { ChatItemResponse, ChatSummary, MyChatResponse } from "@/type/chat/chat";
 import { useEffect, useRef, useState } from "react";
 
@@ -15,9 +17,17 @@ const MAX_WIDTH = 500;
 
 const Chat = () => {
     const [sidebarWidth, setSidebarWidth] = useState(300);
-    const [selectedChat, setSelectedChat] = useState<ChatItemResponse | null>(null);
+    const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
     const { data, isLoading, isError, refetch } = useMyChats();
-    const { response, setResponse, setError, setLoading } = useMyChat(state => state);
+    const { setResponse, setError, setLoading } = useMyChat(state => state);
+    const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+    const user = useUser(state => state.user);
+    const { sendUserOnlineStatus } = useOnlineStatusSender();
+
+    const selectedChat = useMyChat(s => {
+        const items = s.response?.chats?.items || [];
+        return items.find(it => it.id === selectedChatId) || null;
+    });
 
     const isResizing = useRef(false);
 
@@ -36,6 +46,23 @@ const Chat = () => {
             window.removeEventListener("mouseup", handleMouseUp);
         };
     });
+
+    useEffect(() => {
+        if (!user) return;
+
+        const intId = setInterval(() => {
+            console.log("Sending online status to backend");
+
+            sendUserOnlineStatus(user.id);
+        }, 2000);
+
+        setIntervalId(intId);
+
+        return () => {
+            console.log("Clean up interval.");
+            clearInterval(intId);
+        }
+    }, [user?.id])
 
     const handleMouseDown = () => {
         isResizing.current = true;
@@ -61,7 +88,7 @@ const Chat = () => {
                     className="h-full flex-shrink-0 bg-gray-100 dark:bg-[#23262F] border-r border-gray-200 dark:border-[#23262F] transition-colors duration-300"
                     style={{ width: sidebarWidth }}
                 >
-                    <ChatList selectedChat={selectedChat} setSelectedChat={setSelectedChat} width={sidebarWidth} />
+                    <ChatList selectedChatId={selectedChatId} setSelectedChatId={setSelectedChatId} width={sidebarWidth} />
                 </div>
                 <div
                     className="w-2 cursor-col-resize bg-gray-200 dark:bg-[#23262F] hover:bg-gray-300 dark:hover:bg-[#2A2D36] transition-colors duration-300"

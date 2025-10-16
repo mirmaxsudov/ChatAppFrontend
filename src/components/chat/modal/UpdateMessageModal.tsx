@@ -85,6 +85,7 @@ const UpdateMessageModal = ({
                             onChange={(e) => setValue(e.target.value)}
                             placeholder="Edit your message..."
                             maxLength={MAX_LENGTH}
+                            className="break-words"
                         />
                         <div className="flex items-center justify-between text-xs text-muted-foreground">
                             <span className={""}>{remaining} characters left</span>
