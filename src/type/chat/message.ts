@@ -14,6 +14,8 @@ export type MessageItemResponse = {
     files: AttachmentResponse[];
     sentAt: Date;
     seq: number;
+    editedAt: Date;
+    isEdited: boolean;
     replyMessage: ReplyMessagePreview;
     owner: MessageOwnerPreview;
     linkPreview: LinkPreviewResponse;

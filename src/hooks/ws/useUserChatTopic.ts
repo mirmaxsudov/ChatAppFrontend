@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { ws } from '../../lib/ws/stompClient';
 
 export function useUserChatTopic<T = any>(
@@ -8,13 +8,16 @@ export function useUserChatTopic<T = any>(
     onMessage: (chat: T) => void,
     opts?: { ack?: "auto" | "client" | "client-individual"; headers?: Record<string, any> }
 ) {
+    const handlerRef = useRef(onMessage);
+    handlerRef.current = onMessage;
+
     useEffect(() => {
-        if (!userId)
-            return;
-        const unSub = ws.subscribe("/topic/user/chats/" + userId, (payload) => onMessage(payload as T), {
-            ack: opts?.ack,
-            headers: opts?.headers,
-        });
+        if (!userId) return;
+        const unSub = ws.subscribe(
+            "/topic/user/chats/" + userId,
+            (payload) => handlerRef.current(payload as T),
+            opts,
+        );
         return () => unSub?.();
-    }, [userId, JSON.stringify(opts)]);
+    }, [userId, opts?.ack, JSON.stringify(opts?.headers)]);
 }   

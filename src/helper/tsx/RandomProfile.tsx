@@ -6,8 +6,6 @@ const RandomProfile = ({ title = "", bgColor, textColor }: {
     bgColor: string,
     textColor: string
 }) => {
-    const color = generateRandomHexColor();
-
     return <>
         <div
             style={{

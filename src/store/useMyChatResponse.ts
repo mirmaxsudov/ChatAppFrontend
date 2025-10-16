@@ -10,6 +10,8 @@ type MyChatResponseType = {
     setError: (isError: boolean) => void;
     changeLastMessagePreview: (prev: ChatItemMessagePreview, chatId: number) => void;
     changeLastReadMessageSeq: (lastReadMessageSeq: number, chatId: number) => void;
+    changeOnlineStatus: (chatId: number, isOnline: boolean) => void,
+    changeTypingStatus: (chatId: number, isTyping: boolean) => void,
     clearChat: () => void;
 }
 
@@ -71,7 +73,7 @@ const useMyChat = create<MyChatResponseType>((set, get) => {
                 });
 
                 console.log(items, chatId);
-                
+
 
                 return {
                     response: {
@@ -81,6 +83,64 @@ const useMyChat = create<MyChatResponseType>((set, get) => {
                         },
                     },
                 };
+            });
+        },
+        changeOnlineStatus: (chatId: number, isOnline: boolean) => {
+            set((state) => {
+                const response = state.response;
+
+                if (!response?.chats?.items)
+                    return state;
+
+                console.log(chatId, isOnline, " in changer");
+
+
+
+                const changedItems = response.chats.items.map((item) => {
+                    if (item.id === chatId) {
+                        return {
+                            ...item,
+                            isOnline
+                        }
+                    } else
+                        return item;
+                });
+
+                return {
+                    response: {
+                        ...response,
+                        chats: {
+                            items: changedItems
+                        }
+                    }
+                }
+            });
+        },
+        changeTypingStatus: (chatId: number, isTyping: boolean) => {
+            set((state) => {
+                const response = state.response;
+
+                if (!response?.chats?.items)
+                    return state;
+
+                const changedItems = response.chats.items.map((item) => {
+                    if (item.id === chatId) {
+                        return {
+                            ...item,
+                            isTyping
+                        }
+                    } else
+                        return item;
+                });
+
+                return {
+                    response: {
+                        ...response,
+                        chats: {
+                            items: changedItems
+                        }
+                    }
+                }
             });
         },
         setError: (isError: boolean) => {

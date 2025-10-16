@@ -63,4 +63,6 @@ export type ChatItemMessagePreview = {
 export type ChatMessageUpdateType = {
     text: string;
     messageId: number;
+    isEdited: boolean;
+    editedAt: Date | string;
 }

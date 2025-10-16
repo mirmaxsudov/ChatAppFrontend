@@ -3,12 +3,19 @@ import SockJS from "sockjs-client";
 
 export type TokenProvider = () => string | Promise<string>;
 
+type AckMode = "auto" | "client" | "client-individual";
+
+type HandlerRecord = {
+    id: string;
+    cb: (payload: any, frame: IMessage) => void;
+};
+
 type SubRecord = {
     destination: string;
     headers?: Record<string, any>;
-    ack?: "auto" | "client" | "client-individual";
-    cb: (payload: any, frame: IMessage) => void;
+    ack?: AckMode;
     sub?: StompSubscription;
+    handlers: Map<string, HandlerRecord>;
 };
 
 const WS_PATH = "http://localhost:8080/ws";
@@ -144,61 +151,78 @@ export class StompService {
     subscribe = (
         destination: string,
         cb: (payload: any, frame: IMessage) => void,
-        opts?: { headers?: Record<string, any>; ack?: "auto" | "client" | "client-individual" }
+        opts?: { headers?: Record<string, any>; ack?: AckMode }
     ) => {
-        const id = `${destination}::${safeUUID()}`;
-        const record: SubRecord = { destination, cb, headers: opts?.headers, ack: opts?.ack };
+        const key = this.makeSubKey(destination, opts?.ack, opts?.headers);
+        let record = this.subs.get(key);
+        const handlerId = safeUUID();
 
-        const doSubscribe = () => {
-            if (!this.client) return;
-            record.sub = this.client.subscribe(
+        if (!record) {
+            record = {
                 destination,
-                (frame) => {
-                    let data: any = frame.body;
-                    try {
-                        data = JSON.parse(frame.body);
-                    } catch {
-                        // plain string
-                    }
-                    cb(data, frame);
-                    if (record.ack && "ack" in frame) {
-                        // when ack mode is client or client-individual
-                        (frame as any).ack?.();
-                    }
-                },
-                { ack: record.ack ?? "auto", ...(record.headers || {}) }
-            );
-        };
+                headers: opts?.headers,
+                ack: opts?.ack,
+                handlers: new Map<string, HandlerRecord>(),
+            };
+            this.subs.set(key, record);
+            if (this.connected) this.attachUnderlyingSubscription(record);
+        }
 
-        // Save before subscribing so we can resubscribe after reconnect
-        this.subs.set(id, record);
-
-        if (this.connected) doSubscribe();
+        record.handlers.set(handlerId, { id: handlerId, cb });
 
         return () => {
-            const rec = this.subs.get(id);
-            rec?.sub?.unsubscribe();
-            this.subs.delete(id);
+            const current = this.subs.get(key);
+            if (!current) return;
+            current.handlers.delete(handlerId);
+            if (current.handlers.size === 0) {
+                current.sub?.unsubscribe();
+                this.subs.delete(key);
+            }
         };
     };
 
+    private makeSubKey(destination: string, ack?: AckMode, headers?: Record<string, any>): string {
+        const ackPart = ack ?? "auto";
+        const headersPart = headers ? JSON.stringify(this.sortObject(headers)) : "";
+        return `${destination}|ack:${ackPart}|h:${headersPart}`;
+    }
+
+    private sortObject(obj: Record<string, any>): Record<string, any> {
+        const sortedKeys = Object.keys(obj).sort();
+        const out: Record<string, any> = {};
+        for (const k of sortedKeys) {
+            const v = (obj as any)[k];
+            out[k] = v && typeof v === "object" && !Array.isArray(v) ? this.sortObject(v) : v;
+        }
+        return out;
+    }
+
+    private attachUnderlyingSubscription(record: SubRecord) {
+        if (!this.client) return;
+        record.sub = this.client.subscribe(
+            record.destination,
+            (frame) => {
+                let data: any = frame.body;
+                try {
+                    data = JSON.parse(frame.body);
+                } catch { }
+                // fan-out to all handlers
+                record.handlers.forEach((h) => {
+                    try { h.cb(data, frame); } catch (e) { console.error(e); }
+                });
+                if (record.ack && "ack" in frame) {
+                    (frame as any).ack?.();
+                }
+            },
+            { ack: record.ack ?? "auto", ...(record.headers || {}) }
+        );
+    }
+
     private resubscribeAll() {
         if (!this.client) return;
-        this.subs.forEach((record, id) => {
-            record.sub = this.client!.subscribe(
-                record.destination,
-                (frame) => {
-                    let data: any = frame.body;
-                    try {
-                        data = JSON.parse(frame.body);
-                    } catch { }
-                    record.cb(data, frame);
-                    if (record.ack && "ack" in frame) {
-                        (frame as any).ack?.();
-                    }
-                },
-                { ack: record.ack ?? "auto", ...(record.headers || {}) }
-            );
+        this.subs.forEach((record) => {
+            if (record.sub) record.sub.unsubscribe();
+            this.attachUnderlyingSubscription(record);
         });
     }
 

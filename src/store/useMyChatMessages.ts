@@ -42,7 +42,7 @@ const useMyChatMessages = create<MyChatMessaagesType>((set, get) => {
 
             const messages = response.items.map(m => {
                 if (m.id === payload.messageId) {
-                    return { ...m, message: payload.text }
+                    return { ...m, message: payload.text, isEdited: payload.isEdited, editedAt: payload.editedAt }
                 } else {
                     return m;
                 }

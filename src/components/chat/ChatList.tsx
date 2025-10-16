@@ -1,27 +1,20 @@
 "use client";
 
-import { ChatItemResponse, ChatSummary } from "@/type/chat/chat";
+import { ChatItemResponse } from "@/type/chat/chat";
 import { Button } from "../ui/button";
 import ChatItem from "./ChatItem";
-import ChatNav from "./ChatNav";
-import { useMyChats } from "@/hooks/useMyChats";
-import { useEffect, useState, useCallback } from "react";
-import { useUserChatTopic } from "@/hooks/ws/useUserChatTopic";
-import useUser from "@/store/useUser";
-import { ChatType } from "@/enums/ChatEnum";
+import ChatNav from "./ChatNav"; import { useEffect } from "react";
 import clsx from "clsx";
-import { newStartChat } from "@/api/chat/chat.api";
 import useMyChat from "@/store/useMyChatResponse";
 
 type ChatListProps = {
-    setSelectedChat: (chatItem: ChatItemResponse | null) => void;
-    selectedChat: ChatItemResponse | null;
+    setSelectedChatId: (chatId: number | null) => void;
+    selectedChatId: number | null;
     width: number;
 }
 
-const ChatList = ({ width, selectedChat, setSelectedChat }: ChatListProps) => {
+const ChatList = ({ width, selectedChatId, setSelectedChatId }: ChatListProps) => {
     const { isLoading, isError, response } = useMyChat(s => s);
-
 
     return (
         <div style={{ width }} className="w-full relative h-full flex flex-col">
@@ -55,10 +48,10 @@ const ChatList = ({ width, selectedChat, setSelectedChat }: ChatListProps) => {
                         {response?.chats?.items?.map((chat) => (
                             <div
                                 onClick={() => {
-                                    setSelectedChat(chat);
+                                    setSelectedChatId(chat.id);
                                 }}
                                 className={clsx("", {
-                                    "bg-gray-200 dark:bg-[#272A30]": chat?.id === selectedChat?.id
+                                    "bg-gray-200 dark:bg-[#272A30]": chat?.id === selectedChatId
                                 })} key={chat?.id} >
                                 <ChatItem chat={chat} />
                             </div>
