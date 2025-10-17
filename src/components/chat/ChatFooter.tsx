@@ -9,11 +9,16 @@ import { sendMessage } from "@/api/chat/chat.api";
 import useMyNotice from "@/hooks/useMyNotice";
 import NoticeEnum from "@/enums/NoticeEnum";
 import { useTypingSender } from "@/hooks/ws/useTypingSender";
+import { deleteById, uploadAttachments } from "@/api/attachment/attachment.api";
+import { Spinner } from "@/helper/tsx/Spinner";
 
 interface UploadedItem {
-    file: File;
+    fileId: number;
+    file: File,
     url: string;
+    id: string;
     type: "image" | "file";
+    isLoading: boolean;
 }
 
 const ChatFooter = ({ chat }: { chat: ChatItemResponse }) => {
@@ -21,7 +26,7 @@ const ChatFooter = ({ chat }: { chat: ChatItemResponse }) => {
     const [text, setText] = useState<string>("");
     const [uploads, setUploads] = useState<UploadedItem[]>([]);
     const [isSending, setIsSending] = useState<boolean>(false);
-    const [isTyping, setIsTyping] = useState<boolean>(false);
+    const [_, setIsTyping] = useState<boolean>(false);
     const { showMessage, dismiss } = useMyNotice();
     const inputRef = useRef<HTMLInputElement>(null);
     const { sendTyping } = useTypingSender(chat.id, chat.secondUserId!);
@@ -38,17 +43,66 @@ const ChatFooter = ({ chat }: { chat: ChatItemResponse }) => {
     }, [sticker]);
 
     const handleFilesSelected = (files: File[], type: "image" | "file") => {
-        const newUploads = files.map(file => ({
+        const newUploads = files.map((file, index) => ({
+            fileId: -1,
             file,
+            id: crypto.randomUUID(),
             url: type === "image" ? URL.createObjectURL(file) : "",
-            type
+            type,
+            isLoading: true,
         }));
+
         setUploads(prev => [...prev, ...newUploads]);
+
+        uploadToBackend(newUploads.map(file => {
+            return ({
+                id: file.id,
+                file: file.file
+            });
+        }))
     };
 
-    const handleRemoveUpload = (idx: number) => {
+    const uploadToBackend = async (files: {
+        id: string,
+        file: File | Blob
+    }[]) => {
+        try {
+            const { data } = await uploadAttachments(files.map(file => file.file));
+            const idMap = new Map<string, number>();
+            data.forEach((uploadedId, index) => {
+                const file = files[index];
+                if (file) idMap.set(file.id, uploadedId);
+            });
+
+            setUploads(prev => prev.map(upload => {
+                if (idMap.has(upload.id)) {
+                    return {
+                        ...upload,
+                        isLoading: false,
+                        fileId: idMap.get(upload.id) as number
+                    };
+                }
+                return upload;
+            }));
+
+        } catch (e) {
+            console.log(e);
+            // remove failed uploads and notify user
+            setUploads(prev => prev.filter(u => !files.some(f => f.id === u.id)));
+            showMessage("Failed to upload attachment(s). Please try again.", NoticeEnum.ERROR);
+        }
+    }
+
+    const handleRemoveUpload = async (idx: number) => {
+        const toRevoke = uploads[idx];
         setUploads(prev => {
-            const toRevoke = prev[idx];
+            return prev.map((upload, index) => index === idx ? ({
+                ...upload,
+                isLoading: true
+            }) : upload);
+        })
+        await deleteById(uploads[idx].fileId);
+        setUploads(prev => {
             if (toRevoke.type === "image" && toRevoke.url) URL.revokeObjectURL(toRevoke.url);
             return prev.filter((_, i) => i !== idx);
         });
@@ -75,7 +129,7 @@ const ChatFooter = ({ chat }: { chat: ChatItemResponse }) => {
                 sendTyping(false);
             }
 
-            const response = await sendMessage(chat.id, text.trim());
+            const response = await sendMessage(chat.id, text.trim(), uploads.map(upload => upload.fileId));
 
             if (response.success) {
                 dismiss(toastRef);
@@ -173,6 +227,11 @@ const ChatFooter = ({ chat }: { chat: ChatItemResponse }) => {
                                     <span className="truncate w-full">{item.file.name}</span>
                                     <span
                                         className="text-[10px] text-muted-foreground">{(item.file.size / 1024).toFixed(1)} KB</span>
+                                </div>
+                            )}
+                            {item.isLoading && (
+                                <div className="absolute inset-0 rounded-lg bg-black/40 flex items-center justify-center">
+                                    <Spinner className="h-5 w-5 text-white" />
                                 </div>
                             )}
                             <button

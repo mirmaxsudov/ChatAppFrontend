@@ -1,6 +1,6 @@
 import { LinkPreviewEnum, MessageTypeEnum } from "@/enums/ChatEnum"
+import { MessageAttachmentResponse } from "../attachment/messageAttachment";
 import { AttachmentResponse } from "../attachment/attachment";
-import { MessageAttachment } from "../attachment/messageAttachment";
 
 export type MessageResponse = {
     items: MessageItemResponse[];
@@ -10,12 +10,13 @@ export type MessageResponse = {
 export type MessageItemResponse = {
     id: number;
     message: string;
-    attachments: MessageAttachment[];
-    files: AttachmentResponse[];
+    attachments: MessageAttachmentResponse[];
+    files: MessageAttachmentResponse[];
     sentAt: Date;
     seq: number;
     editedAt: Date;
     isEdited: boolean;
+    type: MessageTypeEnum;
     replyMessage: ReplyMessagePreview;
     owner: MessageOwnerPreview;
     linkPreview: LinkPreviewResponse;
@@ -23,13 +24,13 @@ export type MessageItemResponse = {
 
 export type ReplyMessagePreview = {
     replyMessageId: number;
-    attachment: MessageAttachment;
+    attachment: AttachmentResponse;
     title: string;
 }
 
 export type MessageOwnerPreview = {
     userId: number;
-    profileImage: MessageAttachment;
+    profileImage: AttachmentResponse;
 }
 
 export type LinkPreviewResponse = {

@@ -1,7 +1,6 @@
-// components/ui/spinner.tsx
-import {cn} from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
-export function Spinner({className}: { className?: string }) {
+export function Spinner({ className }: { className?: string }) {
     return (
         <svg
             className={cn("animate-spin h-4 w-4 dark:text-[#020618] text-white", className)}

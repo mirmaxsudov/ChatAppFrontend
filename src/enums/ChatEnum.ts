@@ -3,7 +3,7 @@ export enum ChatType {
 }
 
 export enum MessageTypeEnum {
-    TEXT = "TEXT", IMAGE = "IMAGE", VIDEO = "VIDEO", FILE = "FILE", MEDIA_ALBUM = "MEDIA_ALBUM"
+    TEXT = "TEXT", IMAGE = "IMAGE", VIDEO = "VIDEO", FILE = "FILE", MEDIA_ALBUM = "MEDIA_ALBUM", MIXED = "MIXED"
 }
 
 export enum LinkPreviewEnum {

@@ -1,9 +1,10 @@
-import {BOTH_SIDE_READ} from "@/helper/tsx/MessageReadTypes";
+import { BOTH_SIDE_READ } from "@/helper/tsx/MessageReadTypes";
+import { MessageAttachmentResponse } from "@/type/attachment/messageAttachment";
 import clsx from "clsx";
 
-const ImagesMessage = ({imageLinks, isLeft, withCaption}: {
+const ImagesMessage = ({ imageLinks = [], isLeft, withCaption }: {
     withCaption: boolean,
-    imageLinks: string[],
+    imageLinks?: MessageAttachmentResponse[],
     isLeft: boolean
 }) => {
     const len = imageLinks.length;
@@ -11,24 +12,32 @@ const ImagesMessage = ({imageLinks, isLeft, withCaption}: {
     if (len === 0)
         return;
 
+    const getHeightClassForCount = (count: number) => {
+        if (count <= 2) return "h-[446px]";
+        if (count === 3) return "h-[360px]";
+        return "h-[426px]";
+    };
+
+    const containerHeightClass = getHeightClassForCount(len);
+
     return <>
         <div className={clsx("", [
-            {"flex justify-end ": !isLeft && !withCaption}
+            { "flex justify-end ": !isLeft && !withCaption }
         ])}>
-            <div className={clsx("max-w-[426px] max-h-[446px] rounded-[20px]", [
-                {"bg-[#E9EAED] dark:bg-[#23262F]": isLeft},
-                {"bg-[#E0F0FF] dark:bg-[#001A3D]": !isLeft},
-                {"my-[4px]": !withCaption}
+            <div className={clsx("max-w-[426px] max-h-[446px] rounded-[20px] overflow-hidden", [
+                { "bg-[#E9EAED] dark:bg-[#23262F]": isLeft },
+                { "bg-[#E0F0FF] dark:bg-[#001A3D]": !isLeft },
+                { "my-[4px]": !withCaption }
             ])}>
-                <div className="max-h-[426px]">
+                <div className={clsx("overflow-hidden", containerHeightClass)}>
                     <div className={clsx("grid gap-[4px] size-full", [
-                        {"grid-cols-1 grid-rows-1": len === 1},
-                        {"grid-cols-2 grid-rows-1": len === 2},
-                        {"grid-cols-2 grid-rows-1": len === 3},
-                        {"grid-cols-2 grid-rows-2": len >= 4},
+                        { "grid-cols-1 grid-rows-1": len === 1 },
+                        { "grid-cols-2 grid-rows-1": len === 2 },
+                        { "grid-cols-2 grid-rows-2": len === 3 },
+                        { "grid-cols-2 grid-rows-2": len >= 4 },
                     ])}>
                         {imageLinks.slice(0, 4).map((link, index) => {
-                            return <ImageItem key={link} link={link} index={index + 1} count={len}/>
+                            return <ImageItem key={link.id} link={link.attachment.url} index={index + 1} count={len} />
                         })}
                     </div>
                 </div>
@@ -67,12 +76,12 @@ const getBorderRadius = (index: number, count: number) => {
     return "";
 };
 
-const ImageItem = ({link, index, count}: { link: string, index: number, count: number }) => {
+const ImageItem = ({ link, index, count }: { link: string, index: number, count: number }) => {
     return (
         <div
             className={clsx(
-                "w-auto " + getBorderRadius(index, count),
-                {"col-span-2 row-start-2": index === 3 && count === 3}
+                "w-auto overflow-hidden " + getBorderRadius(index, count),
+                { "col-span-2 row-start-2": index === 3 && count === 3 }
             )}
         >
             {(count > 4 && index === 4) ? (
@@ -87,10 +96,10 @@ const ImageItem = ({link, index, count}: { link: string, index: number, count: n
                             filter: "blur(2px)"
                         }}
                     />
-                    <p className="relative z-10 text-white">{count}+</p>
+                    <p className="relative z-10 text-black">{count - 4}+</p>
                 </div>
             ) : (
-                <img className="w-full h-full object-cover border-radius" src={link} alt={link}/>
+                <img className="w-full h-full object-cover border-radius" src={link} alt={link} />
             )}
         </div>
     );
