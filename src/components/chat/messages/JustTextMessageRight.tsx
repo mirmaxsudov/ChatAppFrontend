@@ -7,9 +7,10 @@ import * as ContextMenu from "@radix-ui/react-context-menu";
 import { CopyIcon, Pencil2Icon, TrashIcon } from "@radix-ui/react-icons";
 import { Pin, Reply } from "lucide-react";
 import React, { ReactNode } from "react";
+import { MessageItemResponse } from '../../../type/chat/message';
 
-const JustTextMessageRight = ({ message, isRead = false, edited = false, editedAt, sentAt, chatId, messageId }: {
-  message: string, isRead: boolean, sentAt: Date | string, chatId: number, messageId: number, edited: boolean, editedAt: string | Date
+const JustTextMessageRight = ({ message, text, isRead = false, edited = false, editedAt, sentAt, chatId, messageId }: {
+  message: MessageItemResponse, text: string, isRead: boolean, sentAt: Date | string, chatId: number, messageId: number, edited: boolean, editedAt: string | Date
 }) => {
   const { updateVal, setUpdateMessageData } = useMyModals();
 
@@ -20,7 +21,7 @@ const JustTextMessageRight = ({ message, isRead = false, edited = false, editedA
         <div className="flex flex-col items-end my-[5px]">
           <div className="bg-[#E0F0FF] rounded-[10px] break-all dark:text-[#fff] text-[#080707] py-[8px] px-[16px] dark:bg-[#001A3D] text-justify w-fit max-w-[426px]">
             <p className="text-[14px]" >
-              {message}
+              {text}
             </p>
             <div className="flex mt-[4px] items-center justify-end gap-[5px]">
               {isRead ? BOTH_SIDE_READ : SINGLE_READ}

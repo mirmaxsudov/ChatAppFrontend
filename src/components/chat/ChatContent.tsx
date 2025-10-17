@@ -16,11 +16,13 @@ import JustTextMessageRight from "./messages/JustTextMessageRight";
 import UpdateMessageModal from "./modal/UpdateMessageModal";
 import useMyModals from "@/store/useMyModals";
 import JustTextMessageLeft from "./messages/JustTextMessageLeft";
-import { ChatType } from "@/enums/ChatEnum";
+import { ChatType, MessageTypeEnum } from "@/enums/ChatEnum";
 import { readMessages } from "@/api/chat/chat.api";
 import useMyChatMessages from "@/store/useMyChatMessages";
 import useMyChat from "@/store/useMyChatResponse";
 import useMessageUpdate from "@/hooks/ws/useMessageUpdate";
+import ImageCaptionMessage from "./messages/images/ImageCaptionMessage";
+import ImagesMessage from "./messages/images/ImagesMessage";
 
 const READ_THROTTLE_MS = 300;
 // We'll still use our own geometry tolerance check, so 1 here is okay.
@@ -120,20 +122,23 @@ const AnimatedMessage = ({
             }}
         >
             {isOwn ? (
-                <JustTextMessageRight
-                    message={formattedText}
+                message.type === MessageTypeEnum.TEXT ? <JustTextMessageRight
+                    message={message}
+                    text={formattedText}
                     isRead={isRead}
                     sentAt={message.sentAt}
                     messageId={message.id}
                     edited={message.isEdited}
                     editedAt={message.editedAt}
-                    chatId={chat.id} />
+                    chatId={chat.id} /> : message && (message.type === MessageTypeEnum.IMAGE || message.type === MessageTypeEnum.MEDIA_ALBUM) ?
+                    <ImageCaptionMessage isRead={isRead} message={message} isLeft={false} /> : <ImagesMessage withCaption={false} isLeft={false} />
             ) : (
-                <JustTextMessageLeft
+                message.type === MessageTypeEnum.TEXT ? <JustTextMessageLeft
                     isEdited={message.isEdited}
                     chat={chat}
                     message={formattedText}
-                    sentAt={message.sentAt} />
+                    sentAt={message.sentAt} /> : message && (message.type === MessageTypeEnum.IMAGE || message.type === MessageTypeEnum.MEDIA_ALBUM) ?
+                    <ImageCaptionMessage message={message} isLeft={true} /> : <ImagesMessage withCaption={false} isLeft={true} />
             )}
         </div>
     );

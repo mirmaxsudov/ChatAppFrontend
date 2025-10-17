@@ -12,8 +12,8 @@ const newStartChat = async (targetUserId: number, message: string): Promise<ApiR
     return response.data;
 }
 
-const sendMessage = async (chatId: number, message: string): Promise<ApiResponse<string>> => {
-    const response = await $api.post<ApiResponse<string>>(BASE_URL + "/send-message", null, {
+const sendMessage = async (chatId: number, message: string, attachmentIds: number[]): Promise<ApiResponse<string>> => {
+    const response = await $api.post<ApiResponse<string>>(BASE_URL + "/send-message", attachmentIds, {
         params: {
             chatId,
             message
