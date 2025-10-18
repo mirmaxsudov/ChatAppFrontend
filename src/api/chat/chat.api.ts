@@ -40,4 +40,14 @@ const updateMessage = async (chatId: number, messageId: number, text: string): P
     return response.data;
 }
 
-export { newStartChat, sendMessage, readMessages, updateMessage };
+const deleteMessage = async (chatId: number, messageId: number, isForAll: boolean): Promise<ApiResponse<string>> => {
+    const response = await $api.delete<ApiResponse<string>>(`${BASE_URL}/delete-message/${messageId}`, {
+        params: {
+            chatId,
+            isForAll
+        }
+    });
+    return response.data;
+}
+
+export { newStartChat, sendMessage, readMessages, updateMessage, deleteMessage };

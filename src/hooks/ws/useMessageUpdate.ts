@@ -4,8 +4,6 @@ import { useEffect } from "react";
 
 export function useMessageUpdate(chatId: number, onMessage: (payload: ChatMessageUpdateType) => void) {
     useEffect(() => {
-        console.log(chatId);
-        
         if (!chatId) return;
         ws.subscribe("/topic/user/chats/update-msg/" + chatId, (payload) => {
             onMessage(payload);

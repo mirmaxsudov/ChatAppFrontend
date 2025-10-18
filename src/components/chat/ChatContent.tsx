@@ -426,10 +426,15 @@ const ChatContent = ({ chat }: { chat: ChatItemResponse }) => {
                 setOpen={(val: boolean) => updateVal("updateMessageModal", val)}
                 chatId={updateMessageData?.chatId ?? chat.id}
                 messageId={updateMessageData?.messageId ?? undefined}
-                text={updateMessageData?.text ?? ""}
+                text={updateMessageData?.text || ""}
                 onUpdated={(newText) => {
                     if (updateMessageData?.messageId) {
-                        useMyChatMessages.getState().updateMessage({ messageId: updateMessageData.messageId, text: newText });
+                        useMyChatMessages.getState().updateMessage({
+                            messageId: updateMessageData.messageId,
+                            text: newText,
+                            isEdited: true,
+                            editedAt: new Date()
+                        });
                     }
                     setUpdateMessageData(null);
                 }}

@@ -10,7 +10,7 @@ import NoticeEnum from "@/enums/NoticeEnum";
 
 type UpdateMessageModalType = {
     open: boolean,
-    text: string,
+    text: { chatId: number, messageId: number, message?: string },
     setOpen: (val: boolean) => void,
     chatId?: number,
     messageId?: number,
@@ -23,13 +23,15 @@ const MAX_LENGTH = 4000;
 const UpdateMessageModal = ({
     open, text, setOpen, chatId, messageId, onUpdated
 }: UpdateMessageModalType) => {
-    const [value, setValue] = useState<string>(text || "");
+    const [value, setValue] = useState<string>(text ? text.message ?? "" : "");
     const [saving, setSaving] = useState<boolean>(false);
     const { showMessage } = useMyNotice();
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
     useEffect(() => {
-        if (open) setValue(text || "");
+        if (open) {            
+            setValue(text ? text.message ?? "" : "");
+        }
     }, [open, text]);
 
     useEffect(() => {
@@ -40,9 +42,9 @@ const UpdateMessageModal = ({
     }, [open, value.length]);
 
     const remaining = useMemo(() => MAX_LENGTH - value.length, [value.length]);
-    const isValid = value.trim().length >= MIN_LENGTH && value.length <= MAX_LENGTH && value.trim() !== (text || "").trim();
+    const isValid = value?.trim().length >= MIN_LENGTH && value.length <= MAX_LENGTH && value?.trim() !== (typeof text === 'string' ? text : "").trim();
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
         if (!isValid) return;
 
@@ -91,7 +93,7 @@ const UpdateMessageModal = ({
                             <span className={""}>{remaining} characters left</span>
                             {!isValid && (
                                 <span className="text-destructive">
-                                    {value.trim() === (text || "").trim() ? "No changes detected" : value.trim().length < MIN_LENGTH ? "Message is required" : value.length > MAX_LENGTH ? "Too long" : ""}
+                                    {value?.trim() === (text ? text.message ?? "" : "").trim() ? "No changes detected" : value?.trim().length < MIN_LENGTH ? "Message is required" : value.length > MAX_LENGTH ? "Too long" : ""}
                                 </span>
                             )}
                         </div>

@@ -44,3 +44,9 @@ export type LinkPreviewResponse = {
     contentType: string;
     status: LinkPreviewEnum;
 }
+
+export type MessageDeleteWsResponse = {
+    messageId: number,
+    isForAll: boolean,
+    ownerId: number
+}

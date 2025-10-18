@@ -6,14 +6,26 @@ import useMyModals from "@/store/useMyModals";
 import * as ContextMenu from "@radix-ui/react-context-menu";
 import { CopyIcon, Pencil2Icon, TrashIcon } from "@radix-ui/react-icons";
 import { Pin, Reply } from "lucide-react";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import { MessageItemResponse } from '../../../type/chat/message';
+import DeleteMessagePopover from "../modal/DeleteMessagePopover";
 
 const JustTextMessageRight = ({ message, text, isRead = false, edited = false, editedAt, sentAt, chatId, messageId }: {
   message: MessageItemResponse, text: string, isRead: boolean, sentAt: Date | string, chatId: number, messageId: number, edited: boolean, editedAt: string | Date
 }) => {
   const { updateVal, setUpdateMessageData } = useMyModals();
+  const [showDeletePopover, setShowDeletePopover] = useState(false);
 
+  const handleDeleteClick = () => {
+    setShowDeletePopover(true);
+  };
+
+  const handleMessageDeleted = () => {
+    // This will be called after successful deletion
+    // You might want to refresh the messages or update the UI here
+    console.log("Message deleted successfully");
+    setShowDeletePopover(false);
+  }
 
   return (
     <ContextMenu.Root>
@@ -53,7 +65,7 @@ const JustTextMessageRight = ({ message, text, isRead = false, edited = false, e
           />
           <ContextMenuItem
             onSelect={() => {
-              setUpdateMessageData({ chatId, messageId, text: message });
+              setUpdateMessageData({ chatId, messageId, text: message.message });
               updateVal("updateMessageModal", true);
             }}
             label="Edit"
@@ -71,13 +83,25 @@ const JustTextMessageRight = ({ message, text, isRead = false, edited = false, e
           />
           <ContextMenu.Separator className="h-px bg-gray-200 dark:bg-gray-700 my-1" />
           <ContextMenuItem
-            onSelect={() => console.log("delete")}
+            onSelect={handleDeleteClick}
             label="Delete"
             icon={<TrashIcon className="w-4 h-4" />}
             destructive
           />
         </ContextMenu.Content>
       </ContextMenu.Portal>
+      
+      {/* Delete Message Popover */}
+      {showDeletePopover && (
+        <DeleteMessagePopover
+          messageId={messageId}
+          chatId={chatId}
+          messageText={message.message}
+          onMessageDeleted={handleMessageDeleted}
+          isOpen={showDeletePopover}
+          onClose={() => setShowDeletePopover(false)}
+        />
+      )}
     </ContextMenu.Root>
   );
 };
