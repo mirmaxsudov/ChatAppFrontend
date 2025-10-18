@@ -13,7 +13,7 @@ const ImagesMessage = ({ imageLinks = [], isLeft, withCaption }: {
         return;
 
     const getHeightClassForCount = (count: number) => {
-        if (count <= 2) return "h-[446px]";
+        if (count <= 2) return "h-[400px]";
         if (count === 3) return "h-[360px]";
         return "h-[426px]";
     };
@@ -43,9 +43,8 @@ const ImagesMessage = ({ imageLinks = [], isLeft, withCaption }: {
                 </div>
                 {!withCaption && <>
                     <div className="flex mt-[4px] pr-[10px] pb-[4px] items-center justify-end gap-[5px]">
-                        {BOTH_SIDE_READ}
                         <p className="text-[#747881] text-end text-[10px]">
-                            2:16 PM
+                            2:16 PM 2
                         </p>
                     </div>
                 </>}
